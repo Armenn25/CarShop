@@ -20,7 +20,7 @@ public sealed class JwtTokenService : IJwtTokenService
         _time = time ?? throw new ArgumentNullException(nameof(time));
     }
 
-    public JwtTokenPair IssueTokens(CarUserEntity user)
+    public JwtTokenPair IssueTokens(CarShopUserEntity user)
     {
         // Now from TimeProvider (consistent with the rest of the app)
         var nowInstant = _time.GetUtcNow();
@@ -28,16 +28,16 @@ public sealed class JwtTokenService : IJwtTokenService
         var accessExpires = nowInstant.AddMinutes(_jwt.AccessTokenMinutes).UtcDateTime;
         var refreshExpires = nowInstant.AddDays(_jwt.RefreshTokenDays).UtcDateTime;
 
-        // --- Claims ---
+        // --- Claims (including jti/aud for standard compliance) ---
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Email, user.Email ?? string.Empty),
-            new("is_admin", user.IsAdmin.ToString().ToLowerInvariant()),
-            new("is_manager", user.IsManager.ToString().ToLowerInvariant()),
+            new(ClaimTypes.NameIdentifier,   user.Id.ToString()),
+            new(ClaimTypes.Email,            user.Email),
+            new("is_admin",    user.IsAdmin.ToString().ToLowerInvariant()),
+            new("is_manager",  user.IsManager.ToString().ToLowerInvariant()),
             new("is_employee", user.IsEmployee.ToString().ToLowerInvariant()),
-            new("ver", user.TokenVersion.ToString()),
+            new("ver",         user.TokenVersion.ToString()),
             new(JwtRegisteredClaimNames.Iat, ToUnixTimeSeconds(nowInstant).ToString(), ClaimValueTypes.Integer64),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
             new(JwtRegisteredClaimNames.Aud, _jwt.Audience)
@@ -47,7 +47,7 @@ public sealed class JwtTokenService : IJwtTokenService
         var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
         var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
 
-        // --- access token ---
+        // --- access token (JWT) ---
         var jwt = new JwtSecurityToken(
             issuer: _jwt.Issuer,
             audience: _jwt.Audience,
@@ -60,8 +60,8 @@ public sealed class JwtTokenService : IJwtTokenService
         var accessToken = new JwtSecurityTokenHandler().WriteToken(jwt);
 
         // --- refresh token (raw + hash) ---
-        var refreshRaw = GenerateRefreshTokenRaw(64);
-        var refreshHash = HashRefreshToken(refreshRaw);
+        var refreshRaw = GenerateRefreshTokenRaw(64); // base64url
+        var refreshHash = HashRefreshToken(refreshRaw); // base64url hash
 
         return new JwtTokenPair
         {
@@ -77,11 +77,13 @@ public sealed class JwtTokenService : IJwtTokenService
     {
         using var sha = SHA256.Create();
         var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(rawToken));
+        // Use Base64Url to avoid problematic characters
         return Base64UrlEncoder.Encode(bytes);
     }
 
     private static string GenerateRefreshTokenRaw(int numBytes)
     {
+        // Base64UrlEncoder from Microsoft.IdentityModel.Tokens (without + / =)
         var bytes = RandomNumberGenerator.GetBytes(numBytes);
         return Base64UrlEncoder.Encode(bytes);
     }

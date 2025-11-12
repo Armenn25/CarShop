@@ -1,4 +1,6 @@
+﻿using CarShop.Application.Common.Behaviors;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace CarShop.Application;
 
@@ -6,21 +8,20 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        
+        var assembly = Assembly.GetExecutingAssembly();
+
+        // MediatR only from the Application layer
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
+
+        // FluentValidation from the Application layer
+        services.AddValidatorsFromAssembly(assembly);
+
+        // Pipeline behaviors (npr. ValidationBehavior)
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+        // TimeProvider — if used by handlers
+        services.AddSingleton(TimeProvider.System);
+
         return services;
     }
 }
-
-
-public interface ICarService
-{
-    Task<IEnumerable<CarDto>> GetAllAsync();
-    Task<CarDto?> GetByIdAsync(int id);
-    Task<int> CreateAsync(CarCreateDto dto);
-    Task<bool> UpdateAsync(int id, CarUpdateDto dto);
-    Task<bool> DeleteAsync(int id);
-}
-
-public record CarDto(int Id, string Brand, string Model, int Year, decimal Price);
-public record CarCreateDto(string Brand, string Model, int Year, decimal Price);
-public record CarUpdateDto(string Brand, string Model, int Year, decimal Price);

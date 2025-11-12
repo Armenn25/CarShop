@@ -1,21 +1,58 @@
-using CarShop.Application;
-using Microsoft.EntityFrameworkCore;
+﻿using CarShop.Application.Abstractions;
+using CarShop.Infrastructure.Common;
+using CarShop.Infrastructure.Database;
+using CarShop.Shared.Constants;
+using CarShop.Shared.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace CarShop.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddInfrastructure(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        IHostEnvironment env)
     {
-        var cs = config.GetConnectionString("DefaultConnection") 
-                 ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-        services.AddDbContext<ApplicationDbContext>(opt => opt.UseSqlServer(cs));
+        // Typed ConnectionStrings + validation
+        services.AddOptions<ConnectionStringsOptions>()
+            .Bind(configuration.GetSection(ConnectionStringsOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
-        services.AddScoped<ICarService, EfCarService>();
+        // DbContext: InMemory for test environments; SQL Server otherwise
+        services.AddDbContext<DatabaseContext>((sp, options) =>
+        {
+            if (env.IsTest())
+            {
+                options.UseInMemoryDatabase("IntegrationTestsDb");
+
+                return;
+            }
+
+            var cs = sp.GetRequiredService<IOptions<ConnectionStringsOptions>>().Value.Main;
+            options.UseSqlServer(cs);
+        });
+
+        // IAppDbContext mapping
+        services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<DatabaseContext>());
+
+        // Identity hasher
+        services.AddScoped<IPasswordHasher<CarShopUserEntity>, PasswordHasher<CarShopUserEntity>>();
+
+        // Token service (reads JwtOptions via IOptions<JwtOptions>)
+        services.AddTransient<IJwtTokenService, JwtTokenService>();
+
+        // HttpContext accessor + current user
+        services.AddHttpContextAccessor();
+        services.AddScoped<IAppCurrentUser, AppCurrentUser>();
+
+        // TimeProvider (if used in handlers/services)
+        services.AddSingleton<TimeProvider>(TimeProvider.System);
+
         return services;
     }
 }

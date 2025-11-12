@@ -2,8 +2,6 @@
 using CarShop.Shared.Dtos;
 using CarShop.Shared.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -17,7 +15,7 @@ public static class DependencyInjection
         IConfiguration configuration,
         IHostEnvironment env)
     {
-        // Controllers + uniform BadRequest handling
+        // Controllers + uniform BadRequest
         services.AddControllers()
             .ConfigureApiBehaviorOptions(opts =>
             {
@@ -28,7 +26,6 @@ public static class DependencyInjection
                                              .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage)
                                                  ? "Validation error"
                                                  : e.ErrorMessage));
-
                     return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(new ErrorDto
                     {
                         Code = "validation.failed",
@@ -37,23 +34,23 @@ public static class DependencyInjection
                 };
             });
 
-        // Bind & validate JwtOptions from configuration
+        // Typed options + validation on startup
         services.AddOptions<JwtOptions>()
             .Bind(configuration.GetSection(JwtOptions.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        // JWT authentication
+        // JWT auth (reads from IOptions<JwtOptions>)
         services.AddAuthentication(o =>
         {
             o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-        .AddJwtBearer(o =>
+        .AddJwtBearer((o) =>
         {
             var jwt = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()!;
 
-            o.TokenValidationParameters = new TokenValidationParameters
+            o.TokenValidationParameters = new()
             {
                 ValidateIssuer = true,
                 ValidIssuer = jwt.Issuer,
@@ -66,7 +63,6 @@ public static class DependencyInjection
             };
         });
 
-        // Authorization (default requires authenticated user)
         services.AddAuthorization(o =>
         {
             o.FallbackPolicy = new AuthorizationPolicyBuilder()
@@ -74,12 +70,11 @@ public static class DependencyInjection
                 .Build();
         });
 
-        // Swagger configuration (with JWT support)
+        // Swagger with Bearer auth
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "CarShop API", Version = "v1" });
-
             var xml = Path.Combine(AppContext.BaseDirectory, "CarShop.API.xml");
             if (File.Exists(xml))
                 c.IncludeXmlComments(xml, includeControllerXmlComments: true);
@@ -94,15 +89,10 @@ public static class DependencyInjection
                 BearerFormat = "JWT",
                 Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             };
-
             c.AddSecurityDefinition("Bearer", bearer);
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                { bearer, Array.Empty<string>() }
-            });
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement { { bearer, Array.Empty<string>() } });
         });
 
-        // Exception handling (custom middleware)
         services.AddExceptionHandler<CarShopExceptionHandler>();
         services.AddProblemDetails();
 

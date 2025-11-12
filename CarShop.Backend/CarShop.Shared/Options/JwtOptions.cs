@@ -1,12 +1,16 @@
-﻿namespace CarShop.Shared.Options;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class JwtOptions
+namespace CarShop.Shared.Options;
+
+/// <summary>Typed JWT settings from the "Jwt" section.</summary>
+public sealed class JwtOptions
 {
     public const string SectionName = "Jwt";
 
-    public string Issuer { get; set; } = default!;
-    public string Audience { get; set; } = default!;
-    public string Key { get; set; } = default!;
-    public int AccessTokenMinutes { get; set; } = 60; 
-    public int RefreshTokenDays { get; set; } = 7;    
+    [Required] public string Issuer { get; init; } = default!;
+    [Required] public string Audience { get; init; } = default!;
+    [Required, MinLength(32)] public string Key { get; init; } = default!;
+
+    [Range(1, 1440)] public int AccessTokenMinutes { get; init; } = 20;
+    [Range(1, 90)] public int RefreshTokenDays { get; init; } = 14;
 }
