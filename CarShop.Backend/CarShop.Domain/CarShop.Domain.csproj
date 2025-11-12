@@ -5,6 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="8.1.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CarShop.Shared\CarShop.Shared.csproj" />
   </ItemGroup>
 </Project>

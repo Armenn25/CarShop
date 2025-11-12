@@ -1,5 +1,6 @@
 using CarShop.Application;
 using CarShop.Domain;
+using CarShop.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarShop.Infrastructure;
