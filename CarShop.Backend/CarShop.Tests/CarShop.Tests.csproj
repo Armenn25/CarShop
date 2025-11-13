@@ -30,4 +30,9 @@
     <ProjectReference Include="..\CarShop.Shared\CarShop.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ProductCategoryTests\IntegrationTests\" />
+    <Folder Include="ProductCategoryTests\UnitTests\" />
+  </ItemGroup>
+
 </Project>
