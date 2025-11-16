@@ -4,6 +4,7 @@ using CarShop.Domain.Entities.Commerce;
 using CarShop.Domain.Entities.Identity;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,5 +20,9 @@ public sealed class CartEntity : BaseEntity
     public CarEntity Car { get; set; }
     public decimal Subtotal { get; set; }
     public decimal Tax { get; set; }
-    public decimal Total => Subtotal + Tax;
+    public decimal Total { get; private set; }
+    public void RecalculateTotal()
+    {
+        Total = Subtotal + Tax;
+    }
 }

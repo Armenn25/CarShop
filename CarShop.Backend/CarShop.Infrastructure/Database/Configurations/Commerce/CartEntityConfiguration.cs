@@ -28,7 +28,7 @@ public sealed class CartEntityConfiguration : IEntityTypeConfiguration<CartEntit
 
         b.Property(x => x.Subtotal).HasPrecision(18, 2);
         b.Property(x => x.Tax).HasPrecision(18, 2);
-        b.Property(x=>x.Total).HasPrecision(18, 2);
+        b.Property(x=>x.Total).HasPrecision(18, 2).IsRequired();
 
     }
 }
