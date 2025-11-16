@@ -7,7 +7,7 @@ using CarShop.Domain.Common;
 using CarShop.Domain.Entities.Catalog;
 using CarShop.Domain.Entities.Identity;
 
-namespace CarShop.Domain.Entities.Commerce;
+namespace CarShop.Domain.Entities.Commerc;
 
 public sealed class ReviewEntity : BaseEntity
 {
