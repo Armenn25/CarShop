@@ -11,8 +11,11 @@ public sealed class CarShopUserEntity : BaseEntity
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
     public string? Phone { get; set; }
-    public string Address { get; set; }
+    public string Address { get; set; } = default;
+    public DateTime RegistrationDate { get; set; }
+    public DateTime? LastLoginDate { get; set; }
     public int RoleId { get; set; }
+    public UserRoleEntity Role { get; set; } = default;
     public bool IsActive { get; set; }
     public ICollection<RefreshTokenEntity> RefreshTokens { get; private set; } = new List<RefreshTokenEntity>();
 }

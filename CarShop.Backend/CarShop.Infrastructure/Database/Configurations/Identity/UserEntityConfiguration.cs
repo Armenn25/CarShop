@@ -26,6 +26,11 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<CarShopUs
 
         b.Property(x => x.RoleId).IsRequired();
 
+        b.HasOne(x => x.Role)
+           .WithMany(x => x.Users)
+           .HasForeignKey(x => x.RoleId)
+           .OnDelete(DeleteBehavior.Restrict);
+
         b.Property(x => x.IsActive).HasDefaultValue(true);
 
         b.Property(x => x.CreatedAtUtc).HasDefaultValueSql("GETUTCDATE()");
