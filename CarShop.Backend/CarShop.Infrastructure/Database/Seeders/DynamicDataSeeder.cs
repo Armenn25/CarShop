@@ -14,14 +14,14 @@ public static class DynamicDataSeeder
         // Osiguraj da baza postoji (bez migracija)
         //await context.Database.EnsureCreatedAsync();
 
-        //await SeedUserRolesAsync(context);
-        //await SeedUsersAsync(context);
-        //await SeedStatusesAsync(context);
-        //await SeedCategoriesAsync(context);
-        //await SeedBrandsAsync(context);
-        //await SeedCarsAsync(context);
-        //await SeedInquiriesAsync(context);
-        //await SeedReviewsAsync(context);
+        await SeedUserRolesAsync(context);
+        await SeedUsersAsync(context);
+        await SeedStatusesAsync(context);
+        await SeedCategoriesAsync(context);
+        await SeedBrandsAsync(context);
+        await SeedCarsAsync(context);
+        await SeedInquiriesAsync(context);
+        await SeedReviewsAsync(context);
     }
 
     private static async Task SeedUserRolesAsync(DatabaseContext context)
@@ -285,22 +285,22 @@ public static class DynamicDataSeeder
         {
              new CarEntity
             {
-                BrandId = brands["Toyota"],
-                CategoryId = categories["SUV"],
+                BrandId = brands["Mercedes"],
+                CategoryId = categories["Sedan"],
                 CarStatusId = statuses["Available"],
-                Model = "RAV4 Adventure",
+                Model = "C 320 4 Matic",
                 Vin = "JTM12345678901234",
                 ProductionYear = 2023,
                 Mileage = 12000,
                 Color = "Midnight Blue",
-                BodyStyle = "SUV",
+                BodyStyle = "Sedan",
                 Transmission = "Automatic",
                 FuelType = "Hybrid",
                 Drivetrain = "AWD",
                 Engine = "2.5L Hybrid",
                 HorsePower = "203 hp",
-                PrimaryImageURL = "https://images.carshop.local/cars/rav4-adventure.png",
-                Description = "Pouzdan hibridni SUV sa bogatom opremom i Toyota Safety Sense paketom.",
+                PrimaryImageURL = "https://images.carshop.local/cars/C_220.png",
+                Description = "Pouzdan hibridni Sedan sa bogatom opremom.",
                 Price = 32990m,
                 DiscountedPrice = 31500m,
                 DateAdded = now,
@@ -311,7 +311,7 @@ public static class DynamicDataSeeder
                 BrandId = brands["BMW"],
                 CategoryId = categories["Sedan"],
                 CarStatusId = statuses["Reserved"],
-                Model = "330e xDrive",
+                Model = "330d xDrive",
                 Vin = "WBA12345678905678",
                 ProductionYear = 2022,
                 Mileage = 18000,
@@ -330,10 +330,10 @@ public static class DynamicDataSeeder
             },
             new CarEntity
             {
-                BrandId = brands["Tesla"],
+                BrandId = brands["Ford"],
                 CategoryId = categories["Sedan"],
                 CarStatusId = statuses["Available"],
-                Model = "Model S Long Range",
+                Model = "Mach E",
                 Vin = "5YJ12345678907890",
                 ProductionYear = 2024,
                 Mileage = 5000,
@@ -344,7 +344,7 @@ public static class DynamicDataSeeder
                 Drivetrain = "AWD",
                 Engine = "Dual Motor",
                 HorsePower = "670 hp",
-                PrimaryImageURL = "https://images.carshop.local/cars/tesla-model-s.png",
+                PrimaryImageURL = "https://images.carshop.local/cars/mach-e.png",
                 Description = "Električna limuzina visokih performansi s dosegom preko 600 km.",
                 Price = 89990m,
                 DateAdded = now,
@@ -398,21 +398,21 @@ public static class DynamicDataSeeder
              new InquiryEntity
             {
                 UserId = users["demo"],
-                CarId = cars["RAV4 Adventure"],
-                Subject = "Dostupnost Toyota RAV4",
+                CarId = cars["C 320 4 Matic"],
+                Subject = "Dostupnost Mercedes-Benz C 320 4 Matic",
                 Message = "Zanima me je li vozilo odmah dostupno i da li je moguće probna vožnja ovaj tjedan?",
                 PreferredContactMethod = "Email",
-                StatusId = statuses["Inquiry Pending"],
+                StatusId = statuses["Pending"],
                 CreatedAtUtc = now
             },
             new InquiryEntity
             {
                 UserId = users["tester"],
-                CarId = cars["330e xDrive"],
+                CarId = cars["330d xDrive"],
                 Subject = "Leasing opcije",
-                Message = "Možete li poslati ponudu leasing financiranja za BMW 330e na 5 godina?",
+                Message = "Možete li poslati ponudu leasing financiranja za BMW 330d na 5 godina?",
                 PreferredContactMethod = "Phone",
-                StatusId = statuses["Inquiry Responded"],
+                StatusId = statuses["Responded"],
                 RespondedAtUtc = now,
                 Response = "Poslali smo ponudu s kamatom 3.2% i mogućnošću 20% učešća.",
                 CreatedAtUtc = now
@@ -441,10 +441,10 @@ public static class DynamicDataSeeder
             new ReviewEntity
             {
                 UserId = users["demo"],
-                CarId = cars["Model S Long Range"],
+                CarId = cars["Focus"],
                 Rating = 5,
                 Title = "Nevjerojatne performanse",
-                Content = "Model S je tiha i izuzetno brza, a autopilot je fantastičan na dužim putovanjima.",
+                Content = "Focus je tih i izuzetno brza, a autopilot je fantastičan na dužim putovanjima.",
                 RewievDate = now,
                 IsApproved = true,
                 CreatedAtUtc = now
@@ -452,7 +452,7 @@ public static class DynamicDataSeeder
             new ReviewEntity
             {
                 UserId = users["tester"],
-                CarId = cars["RAV4 Adventure"],
+                CarId = cars["Focus"],
                 Rating = 4,
                 Title = "Praktičan i štedljiv",
                 Content = "Odličan gradski SUV, jedino bi infotainment mogao biti brži.",
