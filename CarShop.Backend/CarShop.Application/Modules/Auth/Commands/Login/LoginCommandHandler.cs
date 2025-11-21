@@ -1,12 +1,13 @@
 ﻿using CarShop.Application.Modules.Auth.Commands.Login;
+using CarShop.Application.Modules.Auth.Dtos;
 
 public sealed class LoginCommandHandler(
     IAppDbContext ctx,
     IJwtTokenService jwt,
     IPasswordHasher<CarShopUserEntity> hasher)
-    : IRequestHandler<LoginCommand, LoginCommandDto>
+    : IRequestHandler<LoginCommand, AuthResultDto>
 {
-    public async Task<LoginCommandDto> Handle(LoginCommand request, CancellationToken ct)
+    public async Task<AuthResultDto> Handle(LoginCommand request, CancellationToken ct)
     {
         var email = request.Email.Trim().ToLowerInvariant();
 
@@ -30,11 +31,17 @@ public sealed class LoginCommandHandler(
 
         await ctx.SaveChangesAsync(ct);
 
-        return new LoginCommandDto
+        return new AuthResultDto
         {
             AccessToken = tokens.AccessToken,
             RefreshToken = tokens.RefreshTokenRaw,
-            ExpiresAtUtc = tokens.RefreshTokenExpiresAtUtc
+            ExpiresAtUtc = tokens.RefreshTokenExpiresAtUtc,
+
+            UserId = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName
         };
     }
 }

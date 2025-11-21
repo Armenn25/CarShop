@@ -1,4 +1,4 @@
-﻿namespace CarShop.Application.Modules.Auth.Commands.Refresh;
+﻿namespace CarShop.Application.Modules.Auth.Dtos;
 
 /// <summary>
 /// DTO returned after a successful token refresh (rotation).

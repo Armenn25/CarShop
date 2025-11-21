@@ -1,4 +1,5 @@
 ﻿using CarShop.Application.Modules.Auth.Commands.Login;
+using CarShop.Application.Modules.Auth.Dtos;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -27,7 +28,7 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<Progr
             var response = await client.PostAsJsonAsync("api/auth/login", loginRequest);
             response.EnsureSuccessStatusCode();
 
-            var loginResponse = await response.Content.ReadFromJsonAsync<LoginCommandDto>();
+            var loginResponse = await response.Content.ReadFromJsonAsync<AuthResultDto>();
             _cachedToken = loginResponse.AccessToken;
         }
         client.DefaultRequestHeaders.Authorization =

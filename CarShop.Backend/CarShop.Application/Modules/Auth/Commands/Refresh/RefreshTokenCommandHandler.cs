@@ -1,4 +1,6 @@
-﻿namespace CarShop.Application.Modules.Auth.Commands.Refresh;
+﻿using CarShop.Application.Modules.Auth.Dtos;
+
+namespace CarShop.Application.Modules.Auth.Commands.Refresh;
 
 public sealed class RefreshTokenCommandHandler(
     IAppDbContext ctx,

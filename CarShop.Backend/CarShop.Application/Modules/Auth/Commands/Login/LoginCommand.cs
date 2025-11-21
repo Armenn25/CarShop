@@ -1,9 +1,11 @@
-﻿namespace CarShop.Application.Modules.Auth.Commands.Login;
+﻿using CarShop.Application.Modules.Auth.Dtos;
+
+namespace CarShop.Application.Modules.Auth.Commands.Login;
 
 /// <summary>
 /// Command for user login and issuing an access/refresh token pair.
 /// </summary>
-public sealed class LoginCommand : IRequest<LoginCommandDto>
+public sealed class LoginCommand : IRequest<AuthResultDto>
 {
     /// <summary>
     /// User's email.
