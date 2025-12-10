@@ -7,15 +7,19 @@ public sealed class CreateUserCommandHandler(IAppDbContext ctx,IPasswordHasher<C
 {
     public async Task<UserDto>Handle(CreateUserCommand request,CancellationToken ct)
     {
+        
         var email = request.Email.Trim().ToLowerInvariant();
         var username = request.Username.Trim();
 
+        //Here we check if the email already exists in database
         if (await ctx.Users.AnyAsync(x => x.Email.ToLower() == email && !x.IsDeleted, ct))
             throw new CarShopConflictException("Email je vec registrovan");
 
+        //Here we check if the username already exists
         if (await ctx.Users.AnyAsync(x => x.Username == username && !x.IsDeleted, ct))
             throw new CarShopConflictException("Username je vec zauzet");
 
+        //Here we check if the role is valid, if it exists!
         var role = await ctx.UserRoles.AsNoTracking().FirstOrDefaultAsync(x => x.Id == request.RoleId && !x.IsDeleted, ct) ??
             throw new CarShopNotFoundException("Uloga nije pronadjena");
 
