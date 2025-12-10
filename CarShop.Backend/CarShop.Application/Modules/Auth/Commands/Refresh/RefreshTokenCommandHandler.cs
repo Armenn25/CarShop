@@ -16,6 +16,7 @@ public sealed class RefreshTokenCommandHandler(
         // 2) Find the valid refresh token in the database (TRACKING because we will modify it)
         var rt = await ctx.RefreshTokens
             .Include(x => x.User)
+            .ThenInclude(x=> x.Role)
             .FirstOrDefaultAsync(x =>
                 x.TokenHash == incomingHash &&
                 !x.IsRevoked &&
@@ -43,7 +44,10 @@ public sealed class RefreshTokenCommandHandler(
         rt.RevokedAtUtc = nowUtc;
 
         // 4) Issue a NEW pair (access + refresh) – the service returns both RAW and HASH along with expirations.
-        var pair = jwt.IssueTokens(user);
+        if (user.Role is null)
+            throw new CarShopNotFoundException("Korisnička uloga nije pronađena.");
+
+        var pair = jwt.IssueTokens(user, user.Role.RoleName);
 
         // 5) Save the NEW refresh token (HASH only) in the database
         var newRt = new RefreshTokenEntity

@@ -20,8 +20,10 @@ public sealed class JwtTokenService : IJwtTokenService
         _time = time ?? throw new ArgumentNullException(nameof(time));
     }
 
-    public JwtTokenPair IssueTokens(CarShopUserEntity user)
+    public JwtTokenPair IssueTokens(CarShopUserEntity user, string roleName)
     {
+        var normalizedRoleName = roleName?.Trim() ?? string.Empty;
+
         // Now from TimeProvider (consistent with the rest of the app)
         var nowInstant = _time.GetUtcNow();
         var nowUtc = nowInstant.UtcDateTime;
@@ -36,6 +38,7 @@ public sealed class JwtTokenService : IJwtTokenService
             new(ClaimTypes.Name,             user.Username),
             new(ClaimTypes.Email,            user.Email),
             new("role_id",                   user.RoleId.ToString()),
+            new(ClaimTypes.Role,             normalizedRoleName),
             new("is_active",                 user.IsActive.ToString().ToLowerInvariant()),
             new("created_at",                user.CreatedAtUtc.ToUniversalTime().ToString("O")),
             new(JwtRegisteredClaimNames.Iat, ToUnixTimeSeconds(nowInstant).ToString(), ClaimValueTypes.Integer64),

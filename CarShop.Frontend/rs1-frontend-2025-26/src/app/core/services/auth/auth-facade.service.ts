@@ -150,29 +150,35 @@ export class AuthFacadeService {
    */
   private decodeAndSetUser(token: string): void {
   try {
-    const payload: any = jwtDecode(token);
+      const payload: any = jwtDecode(token);
 
-    // 🔹 Backend šalje role_id: "1" | "2" | "3"
-    const roleId = Number(payload.role_id);
+      // 🔹 Backend šalje role_id: "1" | "2" | "3"
+      const roleId = Number(payload.role_id);
 
-    // 🔹 Email je u standardnom claimu s URL-om
-    const emailFromClaims =
-      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'];
+      // 🔹 Role claim može biti ClaimTypes.Role ili kratki "role"
+      const rawRoleClaim =
+        payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? payload.role;
+      const roleName = typeof rawRoleClaim === 'string' ? rawRoleClaim.trim() : undefined;
 
-    const user: CurrentUserDto = {
-      userId: Number(payload.sub),
-      email: emailFromClaims,
-      isAdmin: roleId === 1,
-      isManager: roleId === 2,
-      isEmployee: roleId === 3,
-      tokenVersion: 0, // ili stavi nešto ako dodaš "ver" claim na backendu
-    };
+      // 🔹 Email je u standardnom claimu s URL-om
+      const emailFromClaims =
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'];
 
-    this._currentUser.set(user);
-  } catch (error) {
-    console.error('Failed to decode JWT token:', error);
-    this._currentUser.set(null);
-  }
+      const user: CurrentUserDto = {
+        userId: Number(payload.sub),
+        email: emailFromClaims,
+        roleName,
+        isAdmin: roleId === 1,
+        isManager: roleId === 2,
+        isEmployee: roleId === 3,
+        tokenVersion: 0, // ili stavi nešto ako dodaš "ver" claim na backendu
+      };
+
+      this._currentUser.set(user);
+    } catch (error) {
+      console.error('Failed to decode JWT token:', error);
+      this._currentUser.set(null);
+    }
 }
 
 

@@ -37,7 +37,7 @@ public sealed class RegisterCommandHandler(IAppDbContext ctx,IPasswordHasher<Car
 
         user.PasswordHash = hasher.HashPassword(user, request.Password);
 
-        var tokens=jwt.IssueTokens(user);
+        var tokens=jwt.IssueTokens(user, customerRole.RoleName);
 
         ctx.Users.Add(user);
         ctx.RefreshTokens.Add(new RefreshTokenEntity
@@ -53,13 +53,15 @@ public sealed class RegisterCommandHandler(IAppDbContext ctx,IPasswordHasher<Car
         return new AuthResultDto
         {
             AccessToken = tokens.AccessToken,
-            RefreshToken = tokens.RefreshTokenHash,
+            RefreshToken = tokens.RefreshTokenRaw,
             ExpiresAtUtc = tokens.RefreshTokenExpiresAtUtc,
             UserId = user.Id,
             Username = user.Username,
             Email = user.Email,
             FirstName = request.FirstName,
-            LastName = request.LastName
+            LastName = request.LastName,
+            RoleId = customerRole.Id,
+            RoleName = customerRole.RoleName
         };
     }
 }

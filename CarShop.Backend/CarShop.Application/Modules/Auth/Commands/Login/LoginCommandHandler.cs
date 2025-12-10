@@ -12,6 +12,7 @@ public sealed class LoginCommandHandler(
         var email = request.Email.Trim().ToLowerInvariant();
 
         var user = await ctx.Users
+            .Include(x=> x.Role)
             .FirstOrDefaultAsync(x => x.Email.ToLower() == email && x.IsActive && !x.IsDeleted, ct)
             ?? throw new CarShopNotFoundException("Korisnik nije pronađen ili je onemogućen.");
 
@@ -19,7 +20,10 @@ public sealed class LoginCommandHandler(
         if (verify == PasswordVerificationResult.Failed)
             throw new CarShopConflictException("Pogrešni kredencijali.");
 
-        var tokens = jwt.IssueTokens(user);
+        if (user.Role is null)
+            throw new CarShopNotFoundException("Korisnička uloga nije pronađena.");
+
+        var tokens = jwt.IssueTokens(user, user.Role.RoleName);
 
         ctx.RefreshTokens.Add(new RefreshTokenEntity
         {
@@ -31,8 +35,7 @@ public sealed class LoginCommandHandler(
 
         await ctx.SaveChangesAsync(ct);
 
-        var role = await ctx.UserRoles.FindAsync(user.RoleId);
-
+      
         return new AuthResultDto
         {
             AccessToken = tokens.AccessToken,
@@ -46,7 +49,7 @@ public sealed class LoginCommandHandler(
             LastName = user.LastName,
 
             RoleId = user.RoleId,
-            RoleName = role?.RoleName ?? string.Empty
+            RoleName = user.Role.RoleName
         };
     }
 }
