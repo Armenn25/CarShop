@@ -9,8 +9,7 @@
   align-items: center;
   justify-content: center;
   padding: 32px 16px;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.16), transparent 45%),
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.16), transparent 45%),
     radial-gradient(circle at 80% 10%, rgba(91, 157, 255, 0.16), transparent 48%),
     linear-gradient(135deg, #0f3b95 0%, #2c7be9 60%, #3d93ff 100%);
   color: #16233f;
@@ -50,7 +49,7 @@
   /* BALONI – isti fazon kao na loginu */
   &::before,
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     border-radius: 50%;
     z-index: 0;
@@ -190,8 +189,6 @@
   font-size: 15px;
   backdrop-filter: blur(4px);
   opacity: 0.6;
-
-
 }
 
 .step-indicator.current {
@@ -204,7 +201,7 @@
   border-color: #ffffff;
   color: #7b3cff;
   display: flex;
-  align-items:center;
+  align-items: center;
   justify-content: center;
 
   mat-icon {
@@ -441,13 +438,132 @@
   color: inherit;
 }
 @keyframes bubbleMove1 {
-  0%   { transform: translate(0, 0); }
-  50%  { transform: translate(-20px, 15px) scale(1.05); }
-  100% { transform: translate(-40px, -10px) scale(1.1); }
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-20px, 15px) scale(1.05);
+  }
+  100% {
+    transform: translate(-40px, -10px) scale(1.1);
+  }
 }
 
 @keyframes bubbleMove2 {
-  0%   { transform: translate(0, 0); }
-  50%  { transform: translate(25px, -10px) scale(0.95); }
-  100% { transform: translate(40px, 15px) scale(1.02); }
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(25px, -10px) scale(0.95);
+  }
+  100% {
+    transform: translate(40px, 15px) scale(1.02);
+  }
+}
+
+//password strength meter
+.password-strength {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.7;
+  }
+
+  &__badge {
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.04);
+
+    &--empty {
+      opacity: 0;
+    }
+
+    &--weak {
+      color: #ff4d4f;
+      border-color: rgba(255, 77, 79, 0.4);
+      background: rgba(255, 77, 79, 0.08);
+    }
+
+    &--medium {
+      color: #faad14;
+      border-color: rgba(250, 173, 20, 0.5);
+      background: rgba(250, 173, 20, 0.1);
+    }
+
+    &--strong {
+      color: #52c41a;
+      border-color: rgba(82, 196, 26, 0.5);
+      background: rgba(82, 196, 26, 0.12);
+    }
+  }
+
+  &__track {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.02)
+    );
+  }
+
+  &__fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    transition: width 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+
+    &--empty {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    &--weak {
+      background: linear-gradient(90deg, #ff4d4f, #ff7875);
+      box-shadow: 0 0 8px rgba(255, 77, 79, 0.55);
+    }
+
+    &--medium {
+      background: linear-gradient(90deg, #faad14, #fadb14);
+      box-shadow: 0 0 8px rgba(250, 173, 20, 0.55);
+    }
+
+    &--strong {
+      background: linear-gradient(90deg, #52c41a, #73d13d);
+      box-shadow: 0 0 10px rgba(82, 196, 26, 0.65);
+    }
+  }
+
+  &__hint {
+    font-size: 11px;
+    opacity: 0.7;
+  }
 }
