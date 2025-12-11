@@ -11,6 +11,21 @@ export interface LoginCommand {
 }
 
 /**
+ * Command for POST /Auth/register
+ * Corresponds to: RegisterCommand.cs
+ */
+export interface RegisterCommand {
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phone?: string | null;
+  address: string;
+  fingerprint?: string | null;
+}
+
+/**
  * Response for POST /Auth/login
  * Corresponds to: LoginCommandDto.cs
  */

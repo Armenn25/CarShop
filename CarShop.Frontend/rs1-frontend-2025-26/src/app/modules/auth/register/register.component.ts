@@ -3,7 +3,8 @@ import {
   Component,
   EventEmitter,
   Input,
-  Output
+  Output,
+  OnInit
 } from '@angular/core';
 import {
   AbstractControl,
@@ -12,7 +13,9 @@ import {
   ValidationErrors,
   Validators
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthFacadeService } from '../../../core/services/auth/auth-facade.service';
+import { RegisterCommand } from '../../../api-services/auth/auth-api.model';
 
 @Component({
   selector: 'app-register',
@@ -20,7 +23,7 @@ import { Router } from '@angular/router';
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   /** Ako otvaraš kao popup iz public layouta, stavi [compact]="true" */
   @Input() compact = false;
 
@@ -41,10 +44,19 @@ export class RegisterComponent {
   ];
 
   submitted = false;
+  isLoading = false;
+  apiError: string | null = null;
+
+  private returnUrl: string | null = null;
 
   form: FormGroup;
 
-  constructor(private fb: FormBuilder,private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute,
+    private auth: AuthFacadeService
+  ) {
     this.form = this.fb.group(
       {
         firstName: ['', [Validators.required, Validators.maxLength(50)]],
@@ -66,6 +78,10 @@ export class RegisterComponent {
       },
       { validators: this.passwordsMatchValidator }
     );
+  }
+
+  ngOnInit(): void {
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
   }
 
   // --- kontroleri za template ---
@@ -196,28 +212,55 @@ export class RegisterComponent {
   onSubmit(): void {
     this.submitted = true;
     this.form.markAllAsTouched();
+    this.apiError = null;
 
     if (this.form.invalid) {
       this.markStepControlsAsTouched(this.currentStep);
       return;
     }
 
-    const payload = this.form.value;
-    // TODO: pozovi register API
-    console.log('Register payload', payload);
+    const v = this.form.value;
 
-    // nakon uspješne registracije možeš:
-    // - zatvoriti popup
-    // - ili redirect na login/dashboard
-    this.closed.emit();
+    const payload: RegisterCommand = {
+      username: (v.username ?? '').trim(),
+      email: (v.email ?? '').trim().toLowerCase(),
+      password: v.password ?? '',
+      firstName: (v.firstName ?? '').trim(),
+      lastName: (v.lastName ?? '').trim(),
+      phone: v.phone?.toString().trim() || null,
+      address: (v.address ?? '').trim(),
+      fingerprint: null
+    };
+
+    this.isLoading = true;
+
+    this.auth.register(payload).subscribe({
+      next: () => {
+        this.isLoading = false;
+
+        // zatvoriti popup (ako postoji listener)
+        this.closed.emit();
+
+        // ako smo na "pravoj" /auth/register ruti → redirect
+        if (!this.compact && this.openLoginViaRouter) {
+          const target = this.returnUrl ?? '/';
+          this.router.navigateByUrl(target);
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.apiError = err?.error?.message ?? 'Registration failed. Please try again.';
+        console.error('Register error:', err);
+      }
+    });
   }
 
-    onSignInClick(): void {
+  onSignInClick(): void {
     this.signIn.emit();
 
-    // ako se koristi kao klasična ruta (/auth/register)
     if (this.openLoginViaRouter) {
-      this.router.navigate(['/auth/login']);
+      const queryParams = this.returnUrl ? { returnUrl: this.returnUrl } : undefined;
+      this.router.navigate(['/auth/login'], { queryParams });
     }
   }
 

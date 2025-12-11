@@ -11,6 +11,7 @@ import {
   LogoutCommand,
   RefreshTokenCommand,
   RefreshTokenCommandDto,
+  RegisterCommand
 } from '../../../api-services/auth/auth-api.model';
 
 import { AuthStorageService } from './auth-storage.service';
@@ -22,11 +23,6 @@ import { JwtPayloadDto } from './jwt-payload.dto';
  * - priča sa AuthApiService (HTTP)
  * - priča sa AuthStorageService (localStorage)
  * - dekodira JWT i drži CurrentUser kao signal
- *
- * Koristi se u:
- * - interceptoru (getAccessToken, refresh)
- * - guardovima (isAuthenticated, isAdmin)
- * - komponentama (login, logout, navbar)
  */
 @Injectable({ providedIn: 'root' })
 export class AuthFacadeService {
@@ -63,8 +59,23 @@ export class AuthFacadeService {
   login(payload: LoginCommand): Observable<void> {
     return this.api.login(payload).pipe(
       tap((response: LoginCommandDto) => {
-        this.storage.saveLogin(response);           // access + refresh + expiries
+        this.storage.saveLogin(response);            // access + refresh + expiries
         this.decodeAndSetUser(response.accessToken); // popuni _currentUser
+      }),
+      map(() => void 0)
+    );
+  }
+
+  /**
+   * Register korisnika.
+   * Backend vraća iste stvari kao login (tokene + expiry),
+   * pa radimo identičan flow kao u login().
+   */
+  register(payload: RegisterCommand): Observable<void> {
+    return this.api.register(payload).pipe(
+      tap((response: LoginCommandDto) => {
+        this.storage.saveLogin(response);
+        this.decodeAndSetUser(response.accessToken);
       }),
       map(() => void 0)
     );
@@ -149,7 +160,7 @@ export class AuthFacadeService {
    * Dekodiraj JWT i postavi current user state.
    */
   private decodeAndSetUser(token: string): void {
-  try {
+    try {
       const payload: any = jwtDecode(token);
 
       // 🔹 Backend šalje role_id: "1" | "2" | "3"
@@ -171,7 +182,7 @@ export class AuthFacadeService {
         isAdmin: roleId === 1,
         isManager: roleId === 2,
         isEmployee: roleId === 3,
-        tokenVersion: 0, // ili stavi nešto ako dodaš "ver" claim na backendu
+        tokenVersion: 0,
       };
 
       this._currentUser.set(user);
@@ -179,8 +190,7 @@ export class AuthFacadeService {
       console.error('Failed to decode JWT token:', error);
       this._currentUser.set(null);
     }
-}
-
+  }
 
   /**
    * Očisti user state + sve tokene iz storage-a.
