@@ -7,6 +7,7 @@ import {RegisterComponent} from './register/register.component';
 import {ForgotPasswordComponent} from './forgot-password/forgot-password.component';
 import {LogoutComponent} from './logout/logout.component';
 import {SharedModule} from '../shared/shared-module';
+import { AdminDashboardComponent } from '../admin/dashboard/admin-dashboard/admin-dashboard.component';
 
 
 @NgModule({
@@ -16,10 +17,12 @@ import {SharedModule} from '../shared/shared-module';
     RegisterComponent,
     ForgotPasswordComponent,
     LogoutComponent
+
   ],
   imports: [
     AuthRoutingModule,
-    SharedModule
+    SharedModule,
+    AdminDashboardComponent
   ],
   exports: [
     LoginComponent

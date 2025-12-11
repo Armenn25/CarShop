@@ -1,0 +1,354 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #f5f7fb;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ===========================
+   TOP BAR / NAVBAR
+   =========================== */
+
+.top-bar .container {
+  max-width: 1200px; /* ista širina kao dashboard-wrapper */
+}
+
+.top-bar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  z-index: 1000;
+  min-height: 60px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+/* wrapper koji razdvaja lijevu i desnu stranu */
+.top-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-nav {
+  gap: 16px;
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+}
+
+.back-btn {
+  color: #4b5563;
+}
+
+.back-btn .material-icons {
+  font-size: 22px;
+}
+
+.vertical-divider {
+  width: 1px;
+  height: 22px;
+  background-color: #e5e7eb;
+}
+
+.breadcrumb-text {
+  font-size: 16px;
+  color: #4b5563;
+}
+
+.page-title {
+  margin-left: 4px;
+  margin-right: 12px;
+  font-size: 16px;
+  color: #111827;
+}
+
+.primary-button {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Logout button u offcanvasu */
+.logout-section {
+  border-top: 1px solid #e5e7eb;
+}
+
+.logout-btn {
+  font-size: 15px;
+  font-weight: 500;
+  color: #dc2626; /* crvena */
+  padding: 10px 0;
+  border-radius: 8px;
+}
+
+.logout-btn:hover {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.logout-btn .material-icons {
+  font-size: 20px;
+}
+.ul{
+  display: flex !important;
+  justify-content: space-evenly;
+}
+
+/* ===========================
+   MAIN WRAPPER
+   =========================== */
+
+.dashboard-wrapper {
+  max-width: 1200px;
+}
+
+/* ===========================
+   TABS (DESKTOP)
+   =========================== */
+
+.tab-nav-desktop {
+  border-bottom: 1px solid transparent;
+}
+
+.tab-nav-desktop .nav-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  padding: 10px 18px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background-color: transparent;
+}
+
+.tab-nav-desktop .nav-link.active {
+  color: #2563eb;
+  font-weight: 600;
+  border-bottom-color: #2563eb;
+}
+
+/* ===========================
+   METRIC CARDS
+   =========================== */
+
+.metric-card {
+  position: relative;
+  padding: 20px 22px;
+  border-radius: 22px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.05);
+}
+
+.metric-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: #e0edff;
+  color: #2563eb;
+}
+
+.metric-icon .material-icons {
+  font-size: 24px;
+}
+
+.metric-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-label {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.metric-value {
+  font-size: 22px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Trend badge gore desno */
+
+.metric-trend {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  background: #e8fff3;
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.metric-trend .trend-icon {
+  font-size: 16px;
+}
+
+/* ===========================
+   RECENT SALES CARD
+   =========================== */
+
+.recent-sales-card {
+  border-radius: 22px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.04);
+}
+
+.card-header-custom {
+  margin-bottom: 4px;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2563eb;
+  text-transform: uppercase;
+}
+
+.header-left h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.manage-btn {
+  border-radius: 999px;
+  font-size: 13px;
+  padding-inline: 18px;
+}
+
+/* Lista prodaja */
+
+.sales-list {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.sales-list .list-group-item {
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.sales-list .list-group-item:last-child {
+  border-bottom: none;
+}
+
+.list-avatar {
+  margin-right: 4px;
+}
+
+.avatar-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #e0edff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+}
+
+.avatar-icon .material-icons {
+  font-size: 20px;
+}
+
+.list-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.list-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.list-subtitle {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.list-meta {
+  gap: 2px;
+  min-width: 90px;
+}
+
+.price {
+  font-size: 13px;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.price.positive {
+  color: #16a34a;
+}
+
+.date {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* ===========================
+   MOBILE OFFCANVAS TABS
+   =========================== */
+
+.menu-button {
+  border-radius: 999px;
+  padding-inline: 10px;
+  padding-block: 6px;
+}
+
+.menu-button .material-icons {
+  font-size: 22px;
+}
+
+.offcanvas-tabs {
+  max-width: 260px;
+  background: #ffffff;
+  box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15);
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  opacity: 0;
+}
+
+.offcanvas-tabs.show {
+  opacity: 1;
+}
+
+.offcanvas-tabs .tab-btn {
+  font-size: 15px;
+  font-weight: 500;
+  color: #4b5563;
+  padding: 8px 0;
+  border-radius: 8px;
+}
+
+.offcanvas-tabs .list-group-item.active .tab-btn,
+.offcanvas-tabs .tab-btn:hover {
+  color: #2563eb;
+}
+
+.offcanvas-tabs .list-group-item.active .tab-btn {
+  background: #eff6ff;
+}

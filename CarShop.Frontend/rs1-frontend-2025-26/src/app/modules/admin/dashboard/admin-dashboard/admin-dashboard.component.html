@@ -1,0 +1,183 @@
+<!-- MOBILE TABS OFFCANVAS -->
+<div
+  class="offcanvas offcanvas-end offcanvas-tabs"
+  tabindex="-1"
+  id="mobileTabs"
+  aria-labelledby="mobileTabsLabel"
+>
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="mobileTabsLabel">Admin Dashboard</h5>
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="offcanvas"
+      aria-label="Close"
+    ></button>
+  </div>
+
+  <div class="offcanvas-body d-flex flex-column">
+    <ul class="list-group mb-3">
+      <li
+        class="list-group-item border-0 px-0"
+        *ngFor="let tab of tabs"
+        [class.active]="activeTab === tab.label"
+      >
+        <button
+          class="btn w-100 text-start tab-btn d-flex align-items-center gap-2"
+          (click)="activeTab = tab.label"
+          data-bs-dismiss="offcanvas"
+        >
+          <span class="material-icons">{{ tab.icon }}</span>
+          {{ tab.label }}
+        </button>
+      </li>
+    </ul>
+
+    <div class="logout-section mt-auto pt-3">
+      <button
+        class="btn logout-btn w-100 d-flex align-items-center gap-2"
+        (click)="onLogout()"
+      >
+        <span class="material-icons">logout</span>
+        Logout
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<nav class="top-bar bg-white shadow-sm">
+  <div class="container px-3 top-bar-inner">
+    <!-- LIJEVA STRANA -->
+    <div class="d-flex align-items-center gap-2 top-bar-left">
+      <button class="btn btn-link p-0 back-btn" (click)="onLogout()">
+        <span class="material-icons">keyboard_backspace</span>
+      </button>
+
+      <span class="breadcrumb-text">Back</span>
+
+      <div class="vertical-divider"></div>
+
+      <h1 class="h6 mb-0 page-title">Admin Dashboard</h1>
+    </div>
+
+    <!-- DESNA STRANA -->
+    <div class="d-flex align-items-center top-bar-right gap-2">
+      <!-- Desktop dugme -->
+      <button class="btn btn-primary rounded-pill px-4 primary-button d-none d-md-inline-flex">
+        Admin Panel
+      </button>
+
+      <!-- Hamburger za mobilni -->
+      <button
+        class="btn btn-outline-secondary d-inline-flex d-md-none menu-button"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#mobileTabs"
+        aria-controls="mobileTabs"
+      >
+        <span class="material-icons">menu</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT WRAPPER -->
+<div class="container dashboard-wrapper py-4">
+
+  <!-- DESKTOP TABS -->
+  <ul class="nav nav-tabs tab-nav-desktop d-none d-md-flex mb-4">
+    <li class="nav-item" *ngFor="let tab of tabs">
+      <button
+        class="nav-link d-flex align-items-center gap-2"
+        [class.active]="activeTab === tab.label"
+        (click)="activeTab = tab.label"
+        type="button"
+      >
+        <span class="material-icons">{{ tab.icon }}</span>
+        {{ tab.label }}
+      </button>
+    </li>
+  </ul>
+
+  <!-- METRIC CARDS – 4 u redu na desktopu -->
+  <section class="metrics-grid row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
+    <div class="col" *ngFor="let metric of metrics">
+      <div class="card metric-card h-100">
+        <!-- Trend badge gore desno -->
+        <div class="metric-trend" *ngIf="metric.trend">
+          <span class="material-icons trend-icon me-1">trending_up</span>
+          <span>{{ metric.trend }}</span>
+        </div>
+
+        <!-- Ikona + tekst -->
+        <div class="d-flex align-items-center gap-3">
+          <div
+            class="metric-icon d-flex align-items-center justify-content-center"
+            [ngStyle]="{
+              'background-color': metric.iconBg,
+              'color': metric.iconColor
+            }"
+          >
+            <span class="material-icons">
+              {{ metric.icon }}
+            </span>
+          </div>
+
+          <div class="metric-text">
+            <div class="metric-label">{{ metric.label }}</div>
+            <div class="metric-value">{{ metric.value }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECENT SALES -->
+  <div class="card recent-sales-card mt-4">
+    <div class="card-body pb-2">
+      <div
+        class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 card-header-custom"
+      >
+        <div class="header-left">
+          <span class="card-kicker">Recent Sales</span>
+          <h2 class="h5 mb-0">Sales added in your store recently</h2>
+        </div>
+
+        <button class="btn btn-outline-primary rounded-pill manage-btn">
+          Manage Sales
+        </button>
+      </div>
+    </div>
+
+    <div class="border-top"></div>
+
+    <ul class="list-group list-group-flush sales-list">
+      <li
+        class="list-group-item d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2"
+        *ngFor="let sale of recentSales"
+      >
+        <!-- Avatar / ikona -->
+        <div class="list-avatar d-flex align-items-center justify-content-center">
+          <div class="avatar-icon">
+            <span class="material-icons">{{ sale.icon }}</span>
+          </div>
+        </div>
+
+        <!-- Tekst -->
+        <div class="list-text flex-grow-1">
+          <div class="list-title">{{ sale.model }}</div>
+          <div class="list-subtitle">{{ sale.customer }}</div>
+        </div>
+
+        <!-- Meta info desno -->
+        <div class="list-meta d-flex flex-column align-items-start align-items-md-end">
+          <span class="price" [class.positive]="sale.status === 'positive'">
+            {{ sale.price }}
+          </span>
+          <span class="date">{{ sale.date }}</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

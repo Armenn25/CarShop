@@ -31,13 +31,16 @@ export class LoginComponent extends BaseComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    if (this.currentUser.isAuthenticated()) {
-      this.router.navigate([this.currentUser.getDefaultRoute()]);
-      return;
-    }
+  // Ukloni / komentariši ovo:
+  // if (this.currentUser.isAuthenticated()) {
+  //   this.router.navigate([this.currentUser.getDefaultRoute()]);
+  //   return;
+  // }
 
-    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || this.currentUser.getDefaultRoute();
-  }
+  this.returnUrl =
+    this.route.snapshot.queryParamMap.get('returnUrl') ||
+    this.currentUser.getDefaultRoute();
+}
 
   get emailControl() {
     return this.form.get('email');
