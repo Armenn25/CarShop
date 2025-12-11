@@ -7,16 +7,28 @@ import { Component } from '@angular/core';
   templateUrl: './public-layout.component.html',
   styleUrl: './public-layout.component.scss',
 })
+// public-layout.component.ts
 export class PublicLayoutComponent {
   currentYear: string = '2025';
 
   isLoginOpen = false;
+  isLoginClosing = false;
 
-  openLoginModal() {
+  openLoginModal(): void {
+    this.isLoginClosing = false; // reset
     this.isLoginOpen = true;
   }
 
-  closeLoginModal() {
-    this.isLoginOpen = false;
+  closeLoginModal(): void {
+    // ako već ide closing animacija, nemoj duplo
+    if (this.isLoginClosing) return;
+
+    this.isLoginClosing = true;
+
+    // pričekaj da se animacija odradi pa tek onda sakrij popup
+    setTimeout(() => {
+      this.isLoginOpen = false;
+      this.isLoginClosing = false;
+    }, 220); // MORA se poklapati s .2s u CSS-u
   }
 }
