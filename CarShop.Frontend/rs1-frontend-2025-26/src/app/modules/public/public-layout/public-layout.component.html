@@ -159,16 +159,57 @@
           <mat-icon>login</mat-icon>
           Prijavite se sada
         </button>
+      <button
+  mat-stroked-button
+  class="cta-large-button cta-secondary"
+  (click)="openRegisterModal()"
+>
+  <mat-icon>person_add</mat-icon>
+  Kreiraj nalog
+</button>
       </div>
     </section>
   </div>
 </div>
 
 <!-- LOGIN POPUP (MODAL) PREKO CIJELE STRANICE -->
-<!-- BACKDROP + MODAL -->
-<div class="login-backdrop" *ngIf="isLoginOpen" (click)="closeLoginModal()" [class.is-closing]="isLoginClosing">
-  <div class="login-modal" (click)="$event.stopPropagation()" [class.is-closing]="isLoginClosing">
-    <!-- tvoj login u popupu -->
-    <app-login [compact]="true"></app-login>
+<div
+  class="login-backdrop"
+  *ngIf="isLoginOpen"
+  (click)="closeLoginModal()"
+  [class.is-closing]="isLoginClosing"
+>
+  <div
+    class="login-modal"
+    (click)="$event.stopPropagation()"
+    [class.is-closing]="isLoginClosing"
+  >
+    <app-login
+      [compact]="true"
+      [openRegisterViaRouter]="false"
+      (createAccount)="handleCreateAccountFromLogin()"
+    ></app-login>
   </div>
 </div>
+
+<!-- REGISTER POPUP (WIZARD) -->
+<div
+  class="login-backdrop"
+  *ngIf="isRegisterOpen"
+  (click)="closeRegisterModal()"
+  [class.is-closing]="isRegisterClosing"
+>
+  <div
+    class="login-modal"
+    (click)="$event.stopPropagation()"
+    [class.is-closing]="isRegisterClosing"
+  >
+    <app-register
+  [compact]="true"
+  [openLoginViaRouter]="false"
+  (closed)="closeRegisterModal()"
+  (signIn)="handleSignInFromRegister()"></app-register>
+
+  </div>
+</div>
+

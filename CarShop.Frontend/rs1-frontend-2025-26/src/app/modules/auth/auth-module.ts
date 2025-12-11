@@ -1,5 +1,4 @@
 import {NgModule} from '@angular/core';
-
 import {AuthRoutingModule} from './auth-routing-module';
 import {AuthLayoutComponent} from './auth-layout/auth-layout.component';
 import {LoginComponent} from './login/login.component';
@@ -25,7 +24,8 @@ import { AdminDashboardComponent } from '../admin/dashboard/admin-dashboard/admi
     AdminDashboardComponent
   ],
   exports: [
-    LoginComponent
+    LoginComponent,
+    RegisterComponent
   ]
 })
 export class AuthModule { }

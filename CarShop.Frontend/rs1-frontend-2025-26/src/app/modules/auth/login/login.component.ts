@@ -1,4 +1,4 @@
-import { Component, OnInit, inject,Input } from '@angular/core';
+import { Component, OnInit, inject, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoginCommand } from '../../../api-services/auth/auth-api.model';
@@ -13,7 +13,15 @@ import { CurrentUserService } from '../../../core/services/auth/current-user.ser
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent extends BaseComponent implements OnInit {
-  @Input() compact: boolean= false;
+  @Input() compact: boolean = false;
+
+  // ako je true → koristi router da otvori register (full page /auth/register),
+  // ako je false → samo emituje event parentu (popup varijanta)
+  @Input() openRegisterViaRouter: boolean = true;
+
+  // parent (popup) sluša ovaj event i onda zamijeni login → register
+  @Output() createAccount = new EventEmitter<void>();
+
   private fb = inject(FormBuilder);
   private auth = inject(AuthFacadeService);
   private router = inject(Router);
@@ -31,16 +39,16 @@ export class LoginComponent extends BaseComponent implements OnInit {
   });
 
   ngOnInit(): void {
-  // Ukloni / komentariši ovo:
-  // if (this.currentUser.isAuthenticated()) {
-  //   this.router.navigate([this.currentUser.getDefaultRoute()]);
-  //   return;
-  // }
+    // 1) probaj uzeti returnUrl iz query parametara (klasičan guard scenarij)
+    const queryReturnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
 
-  this.returnUrl =
-    this.route.snapshot.queryParamMap.get('returnUrl') ||
-    this.currentUser.getDefaultRoute();
-}
+    // 2) alternativno probaj iz navigation state-a (ako nekad šalješ ovako)
+    const navState = this.router.getCurrentNavigation()?.extras
+      .state as { returnUrl?: string } | undefined;
+
+    this.returnUrl = queryReturnUrl ?? navState?.returnUrl ?? null;
+    // fallback na default rutu radimo tek POSLIJE uspješnog logina
+  }
 
   get emailControl() {
     return this.form.get('email');
@@ -84,6 +92,16 @@ export class LoginComponent extends BaseComponent implements OnInit {
     return '';
   }
 
+  onCreateAccountClick(): void {
+    // javi parentu (popup) da treba switch na register
+    this.createAccount.emit();
+
+    // ako smo na "pravoj" /auth/login ruti – otvori /auth/register
+    if (this.openRegisterViaRouter) {
+      this.router.navigate(['/auth/register']);
+    }
+  }
+
   onSubmit(): void {
     this.submitted = true;
     this.form.markAllAsTouched();
@@ -101,8 +119,13 @@ export class LoginComponent extends BaseComponent implements OnInit {
     this.auth.login(payload).subscribe({
       next: () => {
         this.stopLoading();
-        const target = this.returnUrl || this.currentUser.getDefaultRoute();
-        this.router.navigate([target]);
+
+        // ako smo došli preko guarda (npr. sa /admin),
+        // ideš NAZAD na taj url, inače na default rutu korisnika
+        const target = this.returnUrl ?? this.currentUser.getDefaultRoute();
+
+        // bitno: ovdje koristimo navigateByUrl jer target može biti '/admin/...'
+        this.router.navigateByUrl(target);
       },
       error: (err) => {
         this.stopLoading('Invalid credentials. Please try again.');

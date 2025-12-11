@@ -1,0 +1,453 @@
+:host {
+  display: block;
+}
+
+/* kao login-page, ali za register */
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.16), transparent 45%),
+    radial-gradient(circle at 80% 10%, rgba(91, 157, 255, 0.16), transparent 48%),
+    linear-gradient(135deg, #0f3b95 0%, #2c7be9 60%, #3d93ff 100%);
+  color: #16233f;
+}
+
+/* kad je u popupu (kao login compact) */
+.register-page.register-page-compact {
+  min-height: auto;
+  padding: 0;
+  background: transparent;
+}
+
+/* glavna kartica */
+.register-card {
+  width: 100%;
+  max-width: 640px;
+  background: #ffffff;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 26px 70px rgba(8, 36, 94, 0.35);
+  animation: cardEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* HEADER */
+.register-header {
+  position: relative;
+  background: linear-gradient(135deg, #7b3cff 0%, #ff2bb5 60%, #ff7b4b 100%);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+  padding: 32px 32px 26px;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  /* BALONI – isti fazon kao na loginu */
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  // veći, jači krug
+  &::before {
+    width: 240px;
+    height: 260px;
+    top: -140px;
+    right: 40px;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.25);
+    animation: bubbleMove1 14s ease-in-out infinite alternate;
+  }
+
+  // manji krug
+  &::after {
+    width: 180px;
+    height: 160px;
+    bottom: -60px;
+    right: 200px;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.25);
+    animation: bubbleMove2 18s ease-in-out infinite alternate;
+  }
+
+  /* sve što je unutra mora biti iznad balončića */
+  .header-row,
+  .progress-wrapper {
+    position: relative;
+    z-index: 1;
+  }
+}
+.header-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.92;
+}
+
+.header-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.step-label {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.step-counter {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.header-close-btn {
+  margin-left: 12px;
+  border: none;
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 999px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+
+  mat-icon {
+    color: #ffffff;
+  }
+}
+
+/* PROGRESS */
+.progress-wrapper {
+  position: relative;
+  z-index: 1;
+  margin-top: 22px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+}
+
+.progress-bar-inner {
+  height: 100%;
+  background: #ffffff;
+  border-radius: inherit;
+  width: 0%;
+  transition: width 0.25s ease-out;
+}
+
+/* STEP CIRCLES */
+.step-indicators {
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.step-indicator {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: rgba(0, 0, 0, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 15px;
+  backdrop-filter: blur(4px);
+  opacity: 0.6;
+
+
+}
+
+.step-indicator.current {
+  border-color: #ffffff;
+  opacity: 1;
+}
+
+.step-indicator.done {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #7b3cff;
+  display: flex;
+  align-items:center;
+  justify-content: center;
+
+  mat-icon {
+    color: #7b3cff;
+  }
+}
+
+.step-indicator.upcoming {
+  opacity: 0.3;
+}
+
+/* BODY */
+.register-body {
+  padding: 28px 32px 26px;
+  background: #ffffff;
+}
+
+/* svaki korak malo animiran */
+.wizard-step {
+  animation: stepFadeIn 0.22s ease-out;
+}
+
+/* INPUT STIL – isti fazon kao login */
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #232d4e;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #e3e7f2;
+  background: linear-gradient(180deg, #f7f8fb 0%, #f1f4fb 100%);
+  border-radius: 14px;
+  padding-inline: 14px;
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    border-color: #2b7be9;
+    background-color: #ffffff;
+  }
+
+  &.invalid {
+    border-color: #e34c4c;
+  }
+
+  mat-icon {
+    color: #8c97b8;
+  }
+
+  .auth-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    height: 48px;
+    font-size: 15px;
+    color: #1c2340;
+    box-shadow: none;
+  }
+
+  .auth-input:focus {
+    box-shadow: none;
+  }
+}
+
+/* textarea malo viša */
+.textarea-wrapper .auth-input {
+  height: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.helper-text-muted {
+  display: block;
+  font-size: 12px;
+  color: #6a789b;
+  margin-top: 4px;
+}
+
+.invalid-feedback {
+  font-size: 12px;
+}
+
+/* error banner na 3. koraku */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #ffe5e5;
+  color: #b3261e;
+  border: 1px solid rgba(179, 38, 30, 0.25);
+  margin-bottom: 8px;
+
+  mat-icon {
+    color: inherit;
+  }
+}
+
+/* BUTTONI */
+.wizard-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 16px;
+}
+
+.wizard-actions.single {
+  justify-content: center;
+}
+
+.btn-ghost {
+  border-radius: 16px;
+  background: #f3f4fb;
+  border: none;
+  font-weight: 500;
+  color: #232d4e;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 52px;
+
+  mat-icon {
+    font-size: 18px;
+  }
+}
+
+.primary-gradient-btn {
+  border-radius: 16px;
+  border: none;
+  height: 52px;
+  background-image: linear-gradient(135deg, #4a5dff 0%, #a927ff 50%, #ff2bb5 100%);
+  color: #ffffff;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+
+  mat-icon {
+    color: #ffffff;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 30px rgba(76, 99, 255, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+/* footer */
+.wizard-footer {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 14px;
+  color: #4d587b;
+
+  a {
+    margin-left: 4px;
+    color: #2b7be9;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+/* ANIMACIJE */
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes stepFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* responsive */
+@media (max-width: 540px) {
+  .register-card {
+    max-width: 100%;
+  }
+
+  .register-header {
+    padding-inline: 22px;
+  }
+
+  .register-body {
+    padding-inline: 22px;
+  }
+
+  .header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .header-step {
+    align-items: center;
+  }
+}
+.link-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+@keyframes bubbleMove1 {
+  0%   { transform: translate(0, 0); }
+  50%  { transform: translate(-20px, 15px) scale(1.05); }
+  100% { transform: translate(-40px, -10px) scale(1.1); }
+}
+
+@keyframes bubbleMove2 {
+  0%   { transform: translate(0, 0); }
+  50%  { transform: translate(25px, -10px) scale(0.95); }
+  100% { transform: translate(40px, 15px) scale(1.02); }
+}

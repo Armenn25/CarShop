@@ -9,7 +9,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
 
-import { Router } from '@angular/router';   
+import { Router } from '@angular/router';
 
 interface MetricCard {
   label: string;
@@ -48,11 +48,11 @@ interface RecentSale {
 })
 export class AdminDashboardComponent {
 
-  constructor(private router: Router) {}  
+  constructor(private router: Router) {}
 
-  onLogout() {                            
+  onLogout() {
     localStorage.clear();
-    this.router.navigate(['/public']);
+    this.router.navigate(['/auth/logout']);
   }
 
 

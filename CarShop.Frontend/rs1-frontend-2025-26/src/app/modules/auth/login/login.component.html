@@ -115,10 +115,18 @@
       <div class="line-sep my-3"></div>
 
       <!-- REGISTER ROW -->
-      <div class="register-row">
-        <span>Don't have an account?</span>
-        <a class="link" routerLink="/auth/register">Create one</a>
-      </div>
+  <div class="register-row">
+  <span>Don't have an account?</span>
+  <button
+    type="button"
+    class="link link-button"
+    (click)="onCreateAccountClick()"
+  >
+    Create one
+  </button>
+</div>
+
+
     </form>
   </div>
 </div>
