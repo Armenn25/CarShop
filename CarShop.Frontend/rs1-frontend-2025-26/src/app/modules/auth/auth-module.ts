@@ -7,7 +7,7 @@ import {ForgotPasswordComponent} from './forgot-password/forgot-password.compone
 import {LogoutComponent} from './logout/logout.component';
 import {SharedModule} from '../shared/shared-module';
 import { AdminDashboardComponent } from '../admin/dashboard/admin-dashboard/admin-dashboard.component';
-
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -21,7 +21,8 @@ import { AdminDashboardComponent } from '../admin/dashboard/admin-dashboard/admi
   imports: [
     AuthRoutingModule,
     SharedModule,
-    AdminDashboardComponent
+    AdminDashboardComponent,
+    MatSnackBarModule
   ],
   exports: [
     LoginComponent,

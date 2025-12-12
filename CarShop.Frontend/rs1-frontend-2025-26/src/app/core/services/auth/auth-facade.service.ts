@@ -11,7 +11,8 @@ import {
   LogoutCommand,
   RefreshTokenCommand,
   RefreshTokenCommandDto,
-  RegisterCommand
+  RegisterCommand,
+  AvailabilityDto
 } from '../../../api-services/auth/auth-api.model';
 
 import { AuthStorageService } from './auth-storage.service';
@@ -113,6 +114,32 @@ export class AuthFacadeService {
         this.storage.saveRefresh(response);           // snimi nove tokene
         this.decodeAndSetUser(response.accessToken);  // update current usera
       })
+    );
+  }
+
+  /**
+   * Real-time provjera da li je email slobodan.
+   */
+  checkEmailAvailability(email: string) {
+    if (!email) {
+      return of(false);
+    }
+
+    return this.api.checkEmailAvailability(email).pipe(
+      map((resp: AvailabilityDto) => resp.available)
+    );
+  }
+
+  /**
+   * Real-time provjera da li je username slobodan.
+   */
+  checkUsernameAvailability(username: string) {
+    if (!username) {
+      return of(false);
+    }
+
+    return this.api.checkUsernameAvailability(username).pipe(
+      map((resp: AvailabilityDto) => resp.available)
     );
   }
 

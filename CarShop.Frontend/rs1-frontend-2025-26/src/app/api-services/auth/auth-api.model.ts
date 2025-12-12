@@ -25,6 +25,11 @@ export interface RegisterCommand {
   fingerprint?: string | null;
 }
 
+// === Availability ===
+export interface AvailabilityDto {
+  available: boolean;
+}
+
 /**
  * Response for POST /Auth/login
  * Corresponds to: LoginCommandDto.cs
