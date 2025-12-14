@@ -54,9 +54,6 @@
       <div class="form-field mb-3">
         <div class="label-row">
           <label for="password">Password</label>
-          <a class="link" routerLink="/auth/forgot-password">
-            Forgot password?
-          </a>
         </div>
         <div class="input-wrapper" [class.invalid]="showPasswordError">
           <mat-icon>lock_outline</mat-icon>
@@ -96,7 +93,7 @@
   [disabled]="form.invalid || isLoading"
 >
   <ng-container *ngIf="!isLoading; else loading">
-    <span class="btn-label">Sign in</span>
+    <span class="btn-label">Log in</span>
     <mat-icon class="btn-icon">arrow_forward</mat-icon>
   </ng-container>
 
@@ -106,7 +103,7 @@
       diameter="18"
       strokeWidth="3"
     ></mat-progress-spinner>
-    <span class="btn-label ms-2">Signing in...</span>
+    <span class="btn-label ms-2">Loging in...</span>
   </ng-template>
 </button>
 

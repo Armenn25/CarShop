@@ -14,6 +14,11 @@ export interface MyAuthRouteData {
   requireAdmin?: boolean;
   requireManager?: boolean;
   requireEmployee?: boolean;
+   /**
+   * Ako je korisnik već logovan, blokira pristup ruti (npr. login/register)
+   * i preusmjerava ga na njegovu defaultnu rutu.
+   */
+  blockWhenAuthenticated?: boolean;
 }
 
 export const myAuthGuard: CanActivateFn = (
@@ -27,11 +32,18 @@ export const myAuthGuard: CanActivateFn = (
   const authData = (route.data['auth'] as MyAuthRouteData) || {};
 
   const requireAuth = authData.requireAuth === true;
+  const blockWhenAuthenticated = authData.blockWhenAuthenticated === true;
   const requireAdmin = authData.requireAdmin === true;
   const requireManager = authData.requireManager === true;
   const requireEmployee = authData.requireEmployee === true;
 
   const isAuth = currentUser.isAuthenticated();
+
+// ako je označeno da auth rute ne smiju biti dostupne logovanim korisnicima
+  if (blockWhenAuthenticated && isAuth) {
+    return router.parseUrl(currentUser.getDefaultRoute());
+  }
+
 
   // 1) ako ruta traži auth, a user nije logiran → login + returnUrl
   if (requireAuth && !isAuth) {

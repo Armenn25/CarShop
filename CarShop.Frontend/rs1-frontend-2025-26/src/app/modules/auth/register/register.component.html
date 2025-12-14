@@ -261,15 +261,15 @@
 
           <div class="mb-3 form-group">
             <label class="form-label" for="address">Address</label>
-            <div class="input-wrapper textarea-wrapper" [class.invalid]="showError(address)">
+            <div class="input-wrapper" [class.invalid]="showError(address)">
               <mat-icon>location_on</mat-icon>
-              <textarea
+              <input
                 id="address"
                 rows="3"
                 class="form-control auth-input"
                 formControlName="address"
                 placeholder="123 Main St, City, Country"
-              ></textarea>
+              />
             </div>
             <div class="invalid-feedback d-block" *ngIf="showError(address)">
               Address is required.

@@ -5,10 +5,13 @@ import {LoginComponent} from './login/login.component';
 import {ForgotPasswordComponent} from './forgot-password/forgot-password.component';
 import {RegisterComponent} from './register/register.component';
 import {LogoutComponent} from './logout/logout.component';
+import {myAuthData, myAuthGuard} from '../../core/guards/my-auth-guard';
 
 const routes: Routes = [
   {
     path: '',
+    canActivateChild: [myAuthGuard],
+    data: myAuthData({ blockWhenAuthenticated: true }),
     component: AuthLayoutComponent,
     children: [
       { path: 'login', component: LoginComponent },

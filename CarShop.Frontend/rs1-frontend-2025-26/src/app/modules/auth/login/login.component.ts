@@ -1,4 +1,12 @@
-import { Component, OnInit, inject, Input, Output, EventEmitter } from '@angular/core';
+// src/app/modules/auth/login/login.component.ts
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  inject,
+} from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoginCommand } from '../../../api-services/auth/auth-api.model';
@@ -13,24 +21,20 @@ import { CurrentUserService } from '../../../core/services/auth/current-user.ser
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent extends BaseComponent implements OnInit {
-  @Input() compact: boolean = false;
-
-  // ako je true → koristi router da otvori register (full page /auth/register),
-  // ako je false → samo emituje event parentu (popup varijanta)
-  @Input() openRegisterViaRouter: boolean = true;
-
-  // parent (popup) sluša ovaj event i onda zamijeni login → register
-  @Output() createAccount = new EventEmitter<void>();
-
   private fb = inject(FormBuilder);
   private auth = inject(AuthFacadeService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private currentUser = inject(CurrentUserService);
 
+  // za public popup
+  @Input() compact = false;
+  @Input() openRegisterViaRouter = true;
+  @Output() createAccount = new EventEmitter<void>();
+  @Output() closed = new EventEmitter<void>();
+
   hidePassword = true;
   submitted = false;
-  private returnUrl: string | null = null;
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -39,15 +43,8 @@ export class LoginComponent extends BaseComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    // 1) probaj uzeti returnUrl iz query parametara (klasičan guard scenarij)
-    const queryReturnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-
-    // 2) alternativno probaj iz navigation state-a (ako nekad šalješ ovako)
-    const navState = this.router.getCurrentNavigation()?.extras
-      .state as { returnUrl?: string } | undefined;
-
-    this.returnUrl = queryReturnUrl ?? navState?.returnUrl ?? null;
-    // fallback na default rutu radimo tek POSLIJE uspješnog logina
+    // više NE računamo returnUrl ovdje,
+    // samo eventualno možeš ostaviti prazan hook
   }
 
   get emailControl() {
@@ -64,10 +61,6 @@ export class LoginComponent extends BaseComponent implements OnInit {
       this.emailControl.invalid &&
       (this.emailControl.touched || this.submitted)
     );
-  }
-
-  get showEmailSuccess(): boolean {
-    return !!(this.emailControl && this.emailControl.valid && this.emailControl.touched);
   }
 
   get showPasswordError(): boolean {
@@ -92,16 +85,6 @@ export class LoginComponent extends BaseComponent implements OnInit {
     return '';
   }
 
-  onCreateAccountClick(): void {
-    // javi parentu (popup) da treba switch na register
-    this.createAccount.emit();
-
-    // ako smo na "pravoj" /auth/login ruti – otvori /auth/register
-    if (this.openRegisterViaRouter) {
-      this.router.navigate(['/auth/register']);
-    }
-  }
-
   onSubmit(): void {
     this.submitted = true;
     this.form.markAllAsTouched();
@@ -120,17 +103,37 @@ export class LoginComponent extends BaseComponent implements OnInit {
       next: () => {
         this.stopLoading();
 
-        // ako smo došli preko guarda (npr. sa /admin),
-        // ideš NAZAD na taj url, inače na default rutu korisnika
-        const target = this.returnUrl ?? this.currentUser.getDefaultRoute();
+        // 🔑 VAŽNO: target određujemo TEK SADA, kad je user već logovan
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        const target = returnUrl || this.currentUser.getDefaultRoute();
 
-        // bitno: ovdje koristimo navigateByUrl jer target može biti '/admin/...'
+        // ako si došao sa čuvene returnUrl=/admin/... rute – poštuj to
         this.router.navigateByUrl(target);
+
+        // ako je login u popupu → zatvori modal
+        this.closed.emit();
       },
       error: (err) => {
         this.stopLoading('Invalid credentials. Please try again.');
         console.error('Login error:', err);
       },
     });
+  }
+
+  onCreateAccountClick(): void {
+    this.createAccount.emit();
+
+    // na punoj /auth/login ruti i dalje koristi router za register
+    if (this.openRegisterViaRouter && !this.compact) {
+      this.router.navigate(['/auth/register']);
+    }
+  }
+
+  handleCloseClick(): void {
+    this.closed.emit();
+  }
+
+  togglePasswordVisibility(): void {
+    this.hidePassword = !this.hidePassword;
   }
 }
