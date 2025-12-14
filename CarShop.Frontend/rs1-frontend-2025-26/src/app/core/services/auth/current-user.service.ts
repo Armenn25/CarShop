@@ -37,13 +37,13 @@ getDefaultRoute(): string {
     return '/admin';
   }
 
-  // svi ostali logirani idu na client dio
+  // svi ostali logirani idu na public dio
   if (user.isEmployee) {
-    return '/client';
+    return '/public';
   }
 
   // fallback
-  return '/client';
+  return '/public';
 }
 
 }

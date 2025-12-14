@@ -107,3 +107,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     color: white !important;
   }
 }
+
+.snackbar-success {
+  background: linear-gradient(135deg, #0f766e, #0ea5e9);
+  color: #f9fafb;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+

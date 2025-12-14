@@ -1,5 +1,7 @@
-// src/app/layouts/public-layout/public-layout.component.ts
+// src/app/modules/public/public-layout/public-layout.component.ts
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { CurrentUserService } from '../../../core/services/auth/current-user.service';
 
 @Component({
   selector: 'app-public-layout',
@@ -7,7 +9,6 @@ import { Component } from '@angular/core';
   templateUrl: './public-layout.component.html',
   styleUrl: './public-layout.component.scss',
 })
-// public-layout.component.ts
 export class PublicLayoutComponent {
   currentYear: string = '2025';
 
@@ -19,6 +20,19 @@ export class PublicLayoutComponent {
   isRegisterOpen = false;
   isRegisterClosing = false;
 
+  constructor(
+    private router: Router,
+    private currentUser: CurrentUserService
+  ) {}
+
+  // helper za template – da li je user logovan
+  get isAuthenticated(): boolean {
+    return this.currentUser.isAuthenticated();
+  }
+
+  // =========================
+  // LOGIN MODAL
+  // =========================
   openLoginModal(): void {
     this.isLoginClosing = false;
     this.isLoginOpen = true;
@@ -34,6 +48,9 @@ export class PublicLayoutComponent {
     }, 220);
   }
 
+  // =========================
+  // REGISTER MODAL
+  // =========================
   openRegisterModal(): void {
     this.isRegisterClosing = false;
     this.isRegisterOpen = true;
@@ -49,9 +66,9 @@ export class PublicLayoutComponent {
     }, 220);
   }
 
-  // ⬇ OVO SE POZIVA NA (createAccount) IZ LOGIN-A
+  // poziva se iz <app-login> (createAccount)
   handleCreateAccountFromLogin(): void {
-    // odmah zatvori login popup
+    // zatvori login popup
     this.isLoginOpen = false;
     this.isLoginClosing = false;
 
@@ -59,14 +76,19 @@ export class PublicLayoutComponent {
     this.openRegisterModal();
   }
 
+  // poziva se iz <app-register> (signIn)
   handleSignInFromRegister(): void {
-  // zatvori register popup
-  this.isRegisterOpen = false;
-  this.isRegisterClosing = false;
+    this.isRegisterOpen = false;
+    this.isRegisterClosing = false;
 
-  // odmah otvori login popup
-  this.openLoginModal();
-}
+    this.openLoginModal();
+  }
 
-
+  // =========================
+  // LOGOUT
+  // =========================
+  logout(): void {
+    // postojeći LogoutComponent na /auth/logout ruti
+    this.router.navigate(['/auth/logout']);
+  }
 }

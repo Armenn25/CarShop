@@ -8,7 +8,8 @@ import {
   RefreshTokenCommand,
   RefreshTokenCommandDto,
   LogoutCommand,
-  RegisterCommand
+  RegisterCommand,
+  AvailabilityDto
 } from './auth-api.model';
 
 @Injectable({
@@ -48,5 +49,23 @@ export class AuthApiService {
    */
   logout(payload: LogoutCommand): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/logout`, payload);
+  }
+
+  /**
+   * GET /Auth/check-email?email=
+   */
+  checkEmailAvailability(email: string): Observable<AvailabilityDto> {
+    return this.http.get<AvailabilityDto>(`${this.baseUrl}/check-email`, {
+      params: { email }
+    });
+  }
+
+  /**
+   * GET /Auth/check-username?username=
+   */
+  checkUsernameAvailability(username: string): Observable<AvailabilityDto> {
+    return this.http.get<AvailabilityDto>(`${this.baseUrl}/check-username`, {
+      params: { username }
+    });
   }
 }

@@ -1,7 +1,7 @@
 // src/app/core/services/auth/auth-facade.service.ts
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, of, tap, catchError, map } from 'rxjs';
+import { Observable, of, tap, catchError, map, finalize } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 
 import { AuthApiService } from '../../../api-services/auth/auth-api.service';
@@ -11,7 +11,8 @@ import {
   LogoutCommand,
   RefreshTokenCommand,
   RefreshTokenCommandDto,
-  RegisterCommand
+  RegisterCommand,
+  AvailabilityDto
 } from '../../../api-services/auth/auth-api.model';
 
 import { AuthStorageService } from './auth-storage.service';
@@ -87,21 +88,23 @@ export class AuthFacadeService {
    * - pokuša invalidirati refresh token na serveru (bez drame na error)
    */
   logout(): Observable<void> {
-    const refreshToken = this.storage.getRefreshToken();
+  const refreshToken = this.storage.getRefreshToken();
 
-    // 1) lokalno očisti (optimistic logout)
+  // nema refresh tokena → samo lokalno očisti
+  if (!refreshToken) {
     this.clearUserState();
-
-    // 2) nema refresh tokena → nema ni API poziva
-    if (!refreshToken) {
-      return of(void 0);
-    }
-
-    const payload: LogoutCommand = { refreshToken };
-
-    // 3) pokušaj server-side logout, ignoriši greške
-    return this.api.logout(payload).pipe(catchError(() => of(void 0)));
+    return of(void 0);
   }
+
+  const payload: LogoutCommand = { refreshToken };
+
+  // 1) pošalji zahtjev sa VAŽEĆIM access tokenom
+  // 2) u finalize SVE očisti lokalno (radi i na success i na error)
+  return this.api.logout(payload).pipe(
+    catchError(() => of(void 0)),     // ne rušimo app ako logout endpoint pukne
+    finalize(() => this.clearUserState())
+  );
+}
 
   /**
    * Refresh access tokena – koristi refresh token.
@@ -113,6 +116,32 @@ export class AuthFacadeService {
         this.storage.saveRefresh(response);           // snimi nove tokene
         this.decodeAndSetUser(response.accessToken);  // update current usera
       })
+    );
+  }
+
+  /**
+   * Real-time provjera da li je email slobodan.
+   */
+  checkEmailAvailability(email: string) {
+    if (!email) {
+      return of(false);
+    }
+
+    return this.api.checkEmailAvailability(email).pipe(
+      map((resp: AvailabilityDto) => resp.available)
+    );
+  }
+
+  /**
+   * Real-time provjera da li je username slobodan.
+   */
+  checkUsernameAvailability(username: string) {
+    if (!username) {
+      return of(false);
+    }
+
+    return this.api.checkUsernameAvailability(username).pipe(
+      map((resp: AvailabilityDto) => resp.available)
     );
   }
 
