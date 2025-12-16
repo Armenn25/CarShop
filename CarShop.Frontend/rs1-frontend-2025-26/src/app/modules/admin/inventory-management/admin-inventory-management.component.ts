@@ -1,4 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+
+import { FitConfirmDialogComponent } from '../../shared/components/fit-confirm-dialog/fit-confirm-dialog.component'; 
+import {
+  DialogButton,
+  DialogConfig,
+  DialogType,
+  DialogResult
+} from '../../shared/models/dialog-config.model';
 
 type VehicleStatus = 'In Stock' | 'Limited' | 'Sold';
 type VehicleCondition = 'New' | 'Used';
@@ -52,7 +61,7 @@ interface NewVehicleForm {
   interiorColor: string;
 
   // step 4
-  features: string;      // comma separated in wizard
+  features: string; // comma separated in wizard
   description: string;
   status: VehicleStatus;
   images: File[];
@@ -65,6 +74,8 @@ interface NewVehicleForm {
   styleUrls: ['./admin-inventory-management.component.scss'],
 })
 export class AdminInventoryManagementComponent implements OnInit, OnDestroy {
+  constructor(private dialog: MatDialog) {}
+
   // filters / search
   query = '';
   selectedMake: string = 'all';
@@ -81,6 +92,10 @@ export class AdminInventoryManagementComponent implements OnInit, OnDestroy {
   // wizard state
   showAddWizard = false;
   wizardStep = 1;
+
+  // Edit wizard state
+  isEditMode = false;
+  editingVehicleId: number | null = null;
 
   // view modal state
   showViewModal = false;
@@ -102,7 +117,6 @@ export class AdminInventoryManagementComponent implements OnInit, OnDestroy {
       price: 75990,
       status: 'In Stock',
       imageUrl: 'assets/cars/demo-1.jpg',
-
       engine: '3.0L Twin-Turbo I6',
       drivetrain: 'RWD',
       mpg: '16/23 MPG',
@@ -126,7 +140,6 @@ export class AdminInventoryManagementComponent implements OnInit, OnDestroy {
       price: 42990,
       status: 'In Stock',
       imageUrl: 'assets/cars/demo-2.jpg',
-
       engine: 'Dual Motor (Electric)',
       drivetrain: 'AWD',
       mpg: '120/112 MPGe',
@@ -150,7 +163,6 @@ export class AdminInventoryManagementComponent implements OnInit, OnDestroy {
       price: 118900,
       status: 'Limited',
       imageUrl: 'assets/cars/demo-3.jpg',
-
       engine: '3.0L Turbo I6 + EQ Boost',
       drivetrain: 'AWD',
       mpg: '20/28 MPG',
@@ -193,10 +205,8 @@ export class AdminInventoryManagementComponent implements OnInit, OnDestroy {
         !q || `${v.make} ${v.model} ${v.year}`.toLowerCase().includes(q);
 
       const matchesMake = this.selectedMake === 'all' || v.make === this.selectedMake;
-      const matchesBody =
-        this.selectedBodyType === 'all' || v.bodyType === this.selectedBodyType;
-      const matchesFuel =
-        this.selectedFuelType === 'all' || v.fuelType === this.selectedFuelType;
+      const matchesBody = this.selectedBodyType === 'all' || v.bodyType === this.selectedBodyType;
+      const matchesFuel = this.selectedFuelType === 'all' || v.fuelType === this.selectedFuelType;
 
       const matchesCond =
         this.selectedCondition === 'all' ||
@@ -226,22 +236,67 @@ export class AdminInventoryManagementComponent implements OnInit, OnDestroy {
   }
 
   // -----------------------------
-  // Wizard
+  // Wizard (Add)
   // -----------------------------
   addVehicle(): void {
+    this.isEditMode = false;
+    this.editingVehicleId = null;
+
     this.showAddWizard = true;
     this.wizardStep = 1;
     this.newVehicle = this.createEmptyForm();
 
     setTimeout(() => {
-      document
-        .querySelector('.inv-wizard-card')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelector('.inv-wizard-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }
+
+  // Wizard (Edit)
+  editVehicle(v: Vehicle): void {
+    this.isEditMode = true;
+    this.editingVehicleId = v.id;
+
+    this.showAddWizard = true;
+    this.wizardStep = 1;
+
+    this.newVehicle = {
+      make: v.make ?? '',
+      model: v.model ?? '',
+      year: v.year ?? new Date().getFullYear(),
+      price: v.price ?? 0,
+
+      engine: v.engine ?? '',
+      hp: v.hp ?? 0,
+      transmission: v.transmission ?? 'Automatic',
+      drivetrain: v.drivetrain ?? '',
+      fuelType: v.fuelType ?? 'Gasoline',
+      mpg: v.mpg ?? '',
+
+      bodyType: v.bodyType ?? 'Sedan',
+      miles: v.miles ?? 0,
+      condition: v.condition ?? 'New',
+      seating: v.seating ?? 5,
+      exteriorColor: v.exteriorColor ?? '',
+      interiorColor: v.interiorColor ?? '',
+
+      features: (v.features ?? []).join(', '),
+      description: v.description ?? '',
+      status: v.status ?? 'In Stock',
+      images: [],
+    };
+
+    setTimeout(() => {
+      document.querySelector('.inv-wizard-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 0);
   }
 
   closeWizard(): void {
     this.showAddWizard = false;
+    this.wizardStep = 1;
+
+    this.isEditMode = false;
+    this.editingVehicleId = null;
+    this.newVehicle = this.createEmptyForm();
   }
 
   nextStep(): void {
@@ -266,12 +321,7 @@ export class AdminInventoryManagementComponent implements OnInit, OnDestroy {
         ? URL.createObjectURL(this.newVehicle.images[0])
         : 'assets/cars/demo-1.jpg';
 
-    const featuresArr = this.newVehicle.features
-      ? this.newVehicle.features
-          .split(',')
-          .map(x => x.trim())
-          .filter(Boolean)
-      : [];
+    const featuresArr = this.parseFeatures(this.newVehicle.features);
 
     const vehicle: Vehicle = {
       id,
@@ -302,10 +352,76 @@ export class AdminInventoryManagementComponent implements OnInit, OnDestroy {
     this.rebuildFilterOptions();
     this.applyFilters();
     this.closeWizard();
+    this.showSuccessDialog(
+    'Vehicle added successfully',
+    'The vehicle has been successfully added to the inventory.');
+  
+  }
+
+  // Update existing vehicle
+  updateVehicle(): void {
+    if (!this.isEditMode || this.editingVehicleId == null) return;
+
+    const idx = this.vehicles.findIndex(x => x.id === this.editingVehicleId);
+    if (idx < 0) return;
+
+    const current = this.vehicles[idx];
+
+    const coverUrl =
+      this.newVehicle.images.length > 0
+        ? URL.createObjectURL(this.newVehicle.images[0])
+        : current.imageUrl;
+
+    const featuresArr = this.parseFeatures(this.newVehicle.features);
+
+    const updated: Vehicle = {
+      ...current,
+      make: this.newVehicle.make.trim(),
+      model: this.newVehicle.model.trim(),
+      year: Number(this.newVehicle.year) || current.year,
+      price: Number(this.newVehicle.price) || 0,
+
+      engine: this.newVehicle.engine?.trim(),
+      hp: Number(this.newVehicle.hp) || 0,
+      transmission: this.newVehicle.transmission,
+      drivetrain: this.newVehicle.drivetrain?.trim(),
+      fuelType: this.newVehicle.fuelType,
+      mpg: this.newVehicle.mpg?.trim(),
+
+      bodyType: this.newVehicle.bodyType,
+      miles: Number(this.newVehicle.miles) || 0,
+      condition: this.newVehicle.condition,
+      seating: Number(this.newVehicle.seating) || 5,
+      exteriorColor: this.newVehicle.exteriorColor?.trim(),
+      interiorColor: this.newVehicle.interiorColor?.trim(),
+
+      description: this.newVehicle.description?.trim(),
+      features: featuresArr,
+      status: this.newVehicle.status,
+      imageUrl: coverUrl,
+    };
+
+    this.vehicles[idx] = updated;
+
+    if (this.selectedVehicle?.id === updated.id) {
+      this.selectedVehicle = updated;
+    }
+
+    this.rebuildFilterOptions();
+    this.applyFilters();
+    this.closeWizard();
+    this.showSuccessDialog(
+    'Vehicle updated successfully',
+    'The vehicle details have been successfully updated.');
+
+  }
+
+  private parseFeatures(raw: string): string[] {
+    return raw ? raw.split(',').map(x => x.trim()).filter(Boolean) : [];
   }
 
   // -----------------------------
-  // Card actions
+  // View Modal
   // -----------------------------
   viewVehicle(v: Vehicle): void {
     this.selectedVehicle = v;
@@ -319,20 +435,66 @@ export class AdminInventoryManagementComponent implements OnInit, OnDestroy {
     document.body.classList.remove('inv-modal-open');
   }
 
+  // -----------------------------
+  // Card actions
+  // -----------------------------
   setStatus(v: Vehicle, status: VehicleStatus): void {
     v.status = status;
     this.applyFilters();
-    // keep modal open (looks nicer), but if you want to auto close on delete/sold etc:
-    // this.closeViewModal();
   }
 
-  deleteVehicle(v: Vehicle): void {
+  /**  Ovo je nova metoda: koristi shared FitConfirmDialogComponent */
+  confirmDeleteVehicle(v: Vehicle): void {
+    const dialogRef = this.dialog.open(FitConfirmDialogComponent, {
+      width: '420px',
+      disableClose: true,
+      data: <DialogConfig>{
+        type: DialogType.WARNING,
+        title: 'Delete vehicle',
+        message: 'Are you sure you want to delete this vehicle?\nThis action cannot be undone.',
+        buttons: [
+          { type: DialogButton.CANCEL, label: 'No, cancel' },
+          { type: DialogButton.DELETE, label: 'Yes, delete' }
+        ]
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: DialogResult) => {
+      if (!result) return;
+      if (result.button === DialogButton.DELETE) {
+        this.deleteVehicle(v);
+      }
+    });
+  }
+
+  /* This is succes dialog pop up for add and edit wizard form! */
+  private showSuccessDialog(title: string, message: string): void {
+  this.dialog.open(FitConfirmDialogComponent, {
+    width: '420px',
+    data: <DialogConfig>{
+      type: DialogType.SUCCESS,
+      title,
+      message,
+      buttons: [
+        { type: DialogButton.OK }
+      ]
+    }
+  });
+}
+
+
+  /** Ostaje ista delete logika */
+  private deleteVehicle(v: Vehicle): void {
     this.vehicles = this.vehicles.filter((x) => x.id !== v.id);
     this.rebuildFilterOptions();
     this.applyFilters();
 
     if (this.selectedVehicle?.id === v.id) {
       this.closeViewModal();
+    }
+
+    if (this.editingVehicleId === v.id) {
+      this.closeWizard();
     }
   }
 

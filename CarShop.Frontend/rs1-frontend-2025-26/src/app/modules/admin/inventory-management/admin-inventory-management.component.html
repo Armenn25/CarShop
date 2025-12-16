@@ -145,12 +145,12 @@
     </div>
   </div>
 
-  <!-- ================= ADD VEHICLE WIZARD ================= -->
+  <!-- ================= ADD / EDIT VEHICLE WIZARD ================= -->
   <div class="inv-wizard-card" *ngIf="showAddWizard">
 
     <div class="wizard-head">
       <div>
-        <div class="wizard-title">Add New Vehicle</div>
+        <div class="wizard-title">{{ isEditMode ? 'Edit Vehicle' : 'Add New Vehicle' }}</div>
         <div class="wizard-step">Step {{ wizardStep }} of 4</div>
       </div>
 
@@ -308,12 +308,25 @@
           <div class="file-meta" *ngIf="newVehicle.images.length">
             {{ newVehicle.images.length }} image(s) selected
           </div>
+          <div class="file-meta" *ngIf="isEditMode && !newVehicle.images.length">
+            (Optional) Leave empty to keep current cover image.
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ACTIONS -->
     <div class="wizard-actions">
+      <!-- left: Cancel or Back -->
+      <button
+        class="btn-soft-gray"
+        type="button"
+        *ngIf="wizardStep === 1"
+        (click)="closeWizard()">
+        <span class="material-icons">chevron_left</span>
+        Cancel
+      </button>
+
       <button
         class="btn-soft-gray"
         type="button"
@@ -323,6 +336,7 @@
         Back
       </button>
 
+      <!-- right: Next or Save -->
       <button
         class="btn-primary"
         type="button"
@@ -336,8 +350,8 @@
         class="btn-primary"
         type="button"
         *ngIf="wizardStep === 4"
-        (click)="saveNewVehicle()">
-        Add Vehicle
+        (click)="isEditMode ? updateVehicle() : saveNewVehicle()">
+        {{ isEditMode ? 'Save Changes' : 'Add Vehicle' }}
         <span class="material-icons">check</span>
       </button>
     </div>
@@ -368,21 +382,32 @@
           <div><span class="material-icons">bolt</span>{{ v.hp }} hp</div>
         </div>
 
-        <div class="vehicle-actions">
+        <!-- ✅ NEW: 2x2 actions like your screenshot -->
+        <div class="vehicle-actions-grid">
           <button class="btn-soft" type="button" (click)="viewVehicle(v)">
             <span class="material-icons">visibility</span> View
+          </button>
+
+          <button class="btn-soft info" type="button" (click)="editVehicle(v)">
+            <span class="material-icons">edit</span> Edit
           </button>
 
           <button
             class="btn-soft danger"
             type="button"
-            (click)="setStatus(v,'Sold')"
-            *ngIf="v.status !== 'Sold'">
+            *ngIf="v.status !== 'Sold'; else stockBtn"
+            (click)="setStatus(v,'Sold')">
             <span class="material-icons">close</span> Sold
           </button>
 
-          <button class="icon-trash" type="button" (click)="deleteVehicle(v)" aria-label="Delete">
-            <span class="material-icons">delete</span>
+          <ng-template #stockBtn>
+            <button class="btn-soft success" type="button" (click)="setStatus(v,'In Stock')">
+              <span class="material-icons">check</span> Stock
+            </button>
+          </ng-template>
+
+          <button class="btn-soft gray" type="button" (click)="confirmDeleteVehicle(v)">
+            <span class="material-icons">delete</span> Delete
           </button>
         </div>
       </div>
@@ -437,35 +462,12 @@
           <div class="inv-modal-section__title">Basic Information</div>
 
           <div class="inv-modal-grid">
-            <div class="info-tile">
-              <div class="k">Make</div>
-              <div class="v">{{ v.make }}</div>
-            </div>
-
-            <div class="info-tile">
-              <div class="k">Model</div>
-              <div class="v">{{ v.model }}</div>
-            </div>
-
-            <div class="info-tile">
-              <div class="k">Year</div>
-              <div class="v">{{ v.year }}</div>
-            </div>
-
-            <div class="info-tile">
-              <div class="k">Body Type</div>
-              <div class="v">{{ v.bodyType }}</div>
-            </div>
-
-            <div class="info-tile">
-              <div class="k">Condition</div>
-              <div class="v">{{ v.condition }}</div>
-            </div>
-
-            <div class="info-tile">
-              <div class="k">Mileage</div>
-              <div class="v">{{ v.miles }} miles</div>
-            </div>
+            <div class="info-tile"><div class="k">Make</div><div class="v">{{ v.make }}</div></div>
+            <div class="info-tile"><div class="k">Model</div><div class="v">{{ v.model }}</div></div>
+            <div class="info-tile"><div class="k">Year</div><div class="v">{{ v.year }}</div></div>
+            <div class="info-tile"><div class="k">Body Type</div><div class="v">{{ v.bodyType }}</div></div>
+            <div class="info-tile"><div class="k">Condition</div><div class="v">{{ v.condition }}</div></div>
+            <div class="info-tile"><div class="k">Mileage</div><div class="v">{{ v.miles }} miles</div></div>
           </div>
         </div>
 
@@ -473,35 +475,12 @@
           <div class="inv-modal-section__title">Technical Specifications</div>
 
           <div class="inv-modal-grid">
-            <div class="info-tile">
-              <div class="k">Engine</div>
-              <div class="v">{{ v.engine || '-' }}</div>
-            </div>
-
-            <div class="info-tile">
-              <div class="k">Horsepower</div>
-              <div class="v">{{ v.hp }} hp</div>
-            </div>
-
-            <div class="info-tile">
-              <div class="k">Transmission</div>
-              <div class="v">{{ v.transmission }}</div>
-            </div>
-
-            <div class="info-tile">
-              <div class="k">Fuel Type</div>
-              <div class="v">{{ v.fuelType }}</div>
-            </div>
-
-            <div class="info-tile">
-              <div class="k">Drivetrain</div>
-              <div class="v">{{ v.drivetrain || '-' }}</div>
-            </div>
-
-            <div class="info-tile">
-              <div class="k">MPG</div>
-              <div class="v">{{ v.mpg || '-' }}</div>
-            </div>
+            <div class="info-tile"><div class="k">Engine</div><div class="v">{{ v.engine || '-' }}</div></div>
+            <div class="info-tile"><div class="k">Horsepower</div><div class="v">{{ v.hp }} hp</div></div>
+            <div class="info-tile"><div class="k">Transmission</div><div class="v">{{ v.transmission }}</div></div>
+            <div class="info-tile"><div class="k">Fuel Type</div><div class="v">{{ v.fuelType }}</div></div>
+            <div class="info-tile"><div class="k">Drivetrain</div><div class="v">{{ v.drivetrain || '-' }}</div></div>
+            <div class="info-tile"><div class="k">MPG</div><div class="v">{{ v.mpg || '-' }}</div></div>
           </div>
         </div>
 
@@ -509,20 +488,9 @@
           <div class="inv-modal-section__title">Colors & Interior</div>
 
           <div class="inv-modal-grid inv-modal-grid--3">
-            <div class="info-tile">
-              <div class="k">Exterior Color</div>
-              <div class="v">{{ v.exteriorColor || '-' }}</div>
-            </div>
-
-            <div class="info-tile">
-              <div class="k">Interior Color</div>
-              <div class="v">{{ v.interiorColor || '-' }}</div>
-            </div>
-
-            <div class="info-tile">
-              <div class="k">Seating Capacity</div>
-              <div class="v">{{ v.seating ?? '-' }}</div>
-            </div>
+            <div class="info-tile"><div class="k">Exterior Color</div><div class="v">{{ v.exteriorColor || '-' }}</div></div>
+            <div class="info-tile"><div class="k">Interior Color</div><div class="v">{{ v.interiorColor || '-' }}</div></div>
+            <div class="info-tile"><div class="k">Seating Capacity</div><div class="v">{{ v.seating ?? '-' }}</div></div>
           </div>
         </div>
 
@@ -566,9 +534,10 @@
           Mark as Limited
         </button>
 
-        <button class="btn-modal icon" type="button" (click)="deleteVehicle(v)" aria-label="Delete">
-          <span class="material-icons">delete</span>
+        <button class="btn-modal icon" (click)="confirmDeleteVehicle(v)">
+          <span class="material-icons">delete</span> Delete
         </button>
+
       </div>
 
     </div>

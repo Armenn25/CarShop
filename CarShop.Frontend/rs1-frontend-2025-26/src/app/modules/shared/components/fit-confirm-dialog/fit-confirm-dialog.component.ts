@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { DialogConfig, DialogButton, DialogType, DialogResult } from '../../models/dialog-config.model';
 
+
 @Component({
   selector: 'app-fit-confirm-dialog',
   standalone: false,
