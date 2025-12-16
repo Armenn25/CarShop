@@ -3,7 +3,10 @@
   display: block;
 }
 
-
+/* lock page scroll when modal open */
+:host ::ng-deep body.inv-modal-open{
+  overflow: hidden !important;
+}
 
 .inv-page{
   padding: 18px 0 28px;
@@ -14,7 +17,7 @@
    ========================= */
 
 .inv-toolbar-card{
-  background: #fff; 
+  background: #fff;
   border: 1px solid #e8eef7;
   border-radius: 18px;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
@@ -296,8 +299,6 @@
   }
 }
 
-.req{ color: #ef4444; }
-
 .inv-input{
   height: 42px;
   border-radius: 12px;
@@ -431,7 +432,6 @@
   .muted{ color:#64748b; font-weight: 600; }
 }
 
-/* ✅ DODANO: specs grid (Sedan / Gasoline / Automatic / hp) */
 .vehicle-specs{
   margin-top: 10px;
   display: grid;
@@ -453,7 +453,6 @@
   }
 }
 
-/* ✅ DODANO: actions row (View / Sold / Delete) */
 .vehicle-actions{
   margin-top: 12px;
   display: flex;
@@ -504,11 +503,265 @@
 }
 
 /* =========================
+   VIEW MODAL (BLUR POPUP)
+   ========================= */
+
+.inv-modal-backdrop{
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgba(2, 6, 23, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.inv-modal{
+  position: fixed;
+  inset: 0;
+  z-index: 1060;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.inv-modal-card{
+  width: min(980px, 100%);
+  max-height: min(86vh, 860px);
+  background: #fff;
+  border: 1px solid #e8eef7;
+  border-radius: 18px;
+  box-shadow: 0 30px 90px rgba(0,0,0,.35);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.inv-modal-head{
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #edf2fb;
+}
+
+.inv-modal-title .title{
+  font-weight: 900;
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.inv-modal-title .sub{
+  margin-top: 2px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.inv-modal-x{
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid #e8eef7;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  transition: background .15s ease;
+
+  &:hover{ background:#f8fbff; }
+
+  .material-icons{ font-size: 18px; color: #64748b; }
+}
+
+.inv-modal-body{
+  padding: 14px 16px 16px;
+  overflow: auto;
+}
+
+.inv-modal-hero{
+  position: relative;
+  height: 220px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0b1220;
+
+  img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .pill{
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    color: #fff;
+
+    &.ok{ background: #16a34a; }
+    &.warn{ background: #f59e0b; }
+    &.bad{ background: #ef4444; }
+  }
+}
+
+.inv-modal-price{
+  margin-top: 14px;
+
+  .label{
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 800;
+  }
+  .value{
+    margin-top: 6px;
+    font-size: 34px;
+    font-weight: 900;
+    color: #2563eb;
+    letter-spacing: -0.02em;
+  }
+}
+
+.inv-modal-divider{
+  height: 1px;
+  background: #edf2fb;
+  margin: 14px 0;
+}
+
+.inv-modal-section{
+  margin-top: 14px;
+
+  &__title{
+    font-weight: 900;
+    color: #0f172a;
+    margin-bottom: 10px;
+  }
+}
+
+.inv-modal-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 12px;
+
+  &.inv-modal-grid--3{
+    grid-template-columns: repeat(3, minmax(160px, 1fr));
+  }
+}
+
+.info-tile{
+  border: 1px solid #eef3fb;
+  background: #fbfdff;
+  border-radius: 14px;
+  padding: 12px;
+
+  .k{
+    font-size: 12px;
+    font-weight: 900;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+  .v{
+    font-size: 14px;
+    font-weight: 900;
+    color: #0f172a;
+    word-break: break-word;
+  }
+}
+
+.desc-box{
+  border: 1px solid #eef3fb;
+  background: #fbfdff;
+  border-radius: 14px;
+  padding: 12px;
+  color: #0f172a;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.features{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+}
+
+.feature{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #0f172a;
+  font-weight: 700;
+
+  .material-icons.ok{
+    color: #16a34a;
+    font-size: 20px;
+  }
+}
+
+.muted-note{
+  color: #64748b;
+  font-size: 13px;
+}
+
+.inv-modal-actions{
+  padding: 14px 16px;
+  border-top: 1px solid #edf2fb;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.btn-modal{
+  height: 44px;
+  border-radius: 14px;
+  border: 0;
+  padding: 0 14px;
+  font-weight: 900;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  white-space: nowrap;
+  transition: filter .15s ease, transform .15s ease;
+
+  .material-icons{ font-size: 18px; }
+
+  &:hover{ filter: brightness(0.98); transform: translateY(-1px); }
+  &:active{ transform: translateY(0); }
+
+  &.success{ background: #16a34a; color:#fff; }
+  &.danger{ background: #ef4444; color:#fff; }
+  &.warn{ background: #f97316; color:#fff; }
+
+  &.icon{
+    width: 44px;
+    padding: 0;
+    border: 1px solid #e8eef7;
+    background: #fff;
+    color: #0f172a;
+
+    .material-icons{ color:#64748b; }
+  }
+}
+
+/* =========================
    RESPONSIVE
    ========================= */
 
 @media (max-width: 1200px){
   .inv-grid{ grid-template-columns: repeat(2, minmax(240px, 1fr)); }
+}
+
+@media (max-width: 900px){
+  .inv-modal-grid{ grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+  .features{ grid-template-columns: 1fr; }
+  .inv-modal-actions{
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 768px){
@@ -528,5 +781,18 @@
   .btn-soft-gray,
   .wizard-actions .btn-primary{
     width: 100%;
+  }
+
+  .inv-modal-card{
+    max-height: 90vh;
+  }
+  .inv-modal-hero{
+    height: 190px;
+  }
+  .inv-modal-price .value{
+    font-size: 30px;
+  }
+  .inv-modal-grid{
+    grid-template-columns: 1fr;
   }
 }

@@ -221,6 +221,16 @@
             <option value="Electric">Electric</option>
           </select>
         </div>
+
+        <div class="field">
+          <label>Drivetrain</label>
+          <input class="inv-input" [(ngModel)]="newVehicle.drivetrain" placeholder="RWD / AWD / FWD">
+        </div>
+
+        <div class="field">
+          <label>MPG</label>
+          <input class="inv-input" [(ngModel)]="newVehicle.mpg" placeholder="16/23 MPG">
+        </div>
       </div>
     </div>
 
@@ -252,8 +262,18 @@
         </div>
 
         <div class="field">
-          <label>Color</label>
-          <input class="inv-input" [(ngModel)]="newVehicle.color">
+          <label>Seating Capacity</label>
+          <input class="inv-input" type="number" [(ngModel)]="newVehicle.seating">
+        </div>
+
+        <div class="field">
+          <label>Exterior Color</label>
+          <input class="inv-input" [(ngModel)]="newVehicle.exteriorColor">
+        </div>
+
+        <div class="field">
+          <label>Interior Color</label>
+          <input class="inv-input" [(ngModel)]="newVehicle.interiorColor">
         </div>
       </div>
     </div>
@@ -266,6 +286,11 @@
         <div class="field" style="grid-column: 1 / -1;">
           <label>Description *</label>
           <textarea class="inv-textarea" rows="4" [(ngModel)]="newVehicle.description"></textarea>
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>Features (comma separated)</label>
+          <input class="inv-input" [(ngModel)]="newVehicle.features" placeholder="M Sport Package, Carbon Fiber Trim, ...">
         </div>
 
         <div class="field">
@@ -327,7 +352,6 @@
         <span class="badge" [ngClass]="badgeClass(v.status)">{{ v.status }}</span>
       </div>
 
-      <!-- ✅ DODANO: specs + action buttons -->
       <div class="vehicle-body">
         <div class="vehicle-title">{{ v.make }} {{ v.model }}</div>
         <div class="vehicle-sub">{{ v.year }} · {{ v.condition }}</div>
@@ -352,7 +376,7 @@
           <button
             class="btn-soft danger"
             type="button"
-            (click)="markSold(v)"
+            (click)="setStatus(v,'Sold')"
             *ngIf="v.status !== 'Sold'">
             <span class="material-icons">close</span> Sold
           </button>
@@ -361,6 +385,190 @@
             <span class="material-icons">delete</span>
           </button>
         </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= VIEW MODAL (POPUP) ================= -->
+  <div
+    class="inv-modal-backdrop"
+    *ngIf="showViewModal"
+    (click)="closeViewModal()"
+    aria-hidden="true">
+  </div>
+
+  <div
+    class="inv-modal"
+    *ngIf="showViewModal"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Vehicle details"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="inv-modal-card" (click)="$event.stopPropagation()">
+
+      <div class="inv-modal-head">
+        <div class="inv-modal-title">
+          <div class="title">{{ selectedVehicle?.make }} {{ selectedVehicle?.model }}</div>
+          <div class="sub">{{ selectedVehicle?.year }} · {{ selectedVehicle?.condition }}</div>
+        </div>
+
+        <button class="inv-modal-x" type="button" (click)="closeViewModal()" aria-label="Close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="inv-modal-body" *ngIf="selectedVehicle as v">
+
+        <div class="inv-modal-hero">
+          <img [src]="v.imageUrl" [alt]="v.make + ' ' + v.model">
+          <span class="pill" [ngClass]="badgeClass(v.status)">{{ v.status }}</span>
+        </div>
+
+        <div class="inv-modal-price">
+          <div class="label">Price</div>
+          <div class="value">${{ v.price | number:'1.0-0' }}</div>
+        </div>
+
+        <div class="inv-modal-divider"></div>
+
+        <div class="inv-modal-section">
+          <div class="inv-modal-section__title">Basic Information</div>
+
+          <div class="inv-modal-grid">
+            <div class="info-tile">
+              <div class="k">Make</div>
+              <div class="v">{{ v.make }}</div>
+            </div>
+
+            <div class="info-tile">
+              <div class="k">Model</div>
+              <div class="v">{{ v.model }}</div>
+            </div>
+
+            <div class="info-tile">
+              <div class="k">Year</div>
+              <div class="v">{{ v.year }}</div>
+            </div>
+
+            <div class="info-tile">
+              <div class="k">Body Type</div>
+              <div class="v">{{ v.bodyType }}</div>
+            </div>
+
+            <div class="info-tile">
+              <div class="k">Condition</div>
+              <div class="v">{{ v.condition }}</div>
+            </div>
+
+            <div class="info-tile">
+              <div class="k">Mileage</div>
+              <div class="v">{{ v.miles }} miles</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-modal-section">
+          <div class="inv-modal-section__title">Technical Specifications</div>
+
+          <div class="inv-modal-grid">
+            <div class="info-tile">
+              <div class="k">Engine</div>
+              <div class="v">{{ v.engine || '-' }}</div>
+            </div>
+
+            <div class="info-tile">
+              <div class="k">Horsepower</div>
+              <div class="v">{{ v.hp }} hp</div>
+            </div>
+
+            <div class="info-tile">
+              <div class="k">Transmission</div>
+              <div class="v">{{ v.transmission }}</div>
+            </div>
+
+            <div class="info-tile">
+              <div class="k">Fuel Type</div>
+              <div class="v">{{ v.fuelType }}</div>
+            </div>
+
+            <div class="info-tile">
+              <div class="k">Drivetrain</div>
+              <div class="v">{{ v.drivetrain || '-' }}</div>
+            </div>
+
+            <div class="info-tile">
+              <div class="k">MPG</div>
+              <div class="v">{{ v.mpg || '-' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-modal-section">
+          <div class="inv-modal-section__title">Colors & Interior</div>
+
+          <div class="inv-modal-grid inv-modal-grid--3">
+            <div class="info-tile">
+              <div class="k">Exterior Color</div>
+              <div class="v">{{ v.exteriorColor || '-' }}</div>
+            </div>
+
+            <div class="info-tile">
+              <div class="k">Interior Color</div>
+              <div class="v">{{ v.interiorColor || '-' }}</div>
+            </div>
+
+            <div class="info-tile">
+              <div class="k">Seating Capacity</div>
+              <div class="v">{{ v.seating ?? '-' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inv-modal-section">
+          <div class="inv-modal-section__title">Description</div>
+          <div class="desc-box">
+            {{ v.description || '—' }}
+          </div>
+        </div>
+
+        <div class="inv-modal-section">
+          <div class="inv-modal-section__title">Features</div>
+
+          <div class="features" *ngIf="v.features?.length; else noFeatures">
+            <div class="feature" *ngFor="let f of v.features">
+              <span class="material-icons ok">check_circle</span>
+              <span>{{ f }}</span>
+            </div>
+          </div>
+
+          <ng-template #noFeatures>
+            <div class="muted-note">No features listed.</div>
+          </ng-template>
+        </div>
+
+      </div>
+
+      <div class="inv-modal-actions" *ngIf="selectedVehicle as v">
+        <button class="btn-modal success" type="button" (click)="setStatus(v,'In Stock')">
+          <span class="material-icons">check</span>
+          Mark as Available
+        </button>
+
+        <button class="btn-modal danger" type="button" (click)="setStatus(v,'Sold')">
+          <span class="material-icons">close</span>
+          Mark as Sold
+        </button>
+
+        <button class="btn-modal warn" type="button" (click)="setStatus(v,'Limited')">
+          <span class="material-icons">edit</span>
+          Mark as Limited
+        </button>
+
+        <button class="btn-modal icon" type="button" (click)="deleteVehicle(v)" aria-label="Delete">
+          <span class="material-icons">delete</span>
+        </button>
       </div>
 
     </div>

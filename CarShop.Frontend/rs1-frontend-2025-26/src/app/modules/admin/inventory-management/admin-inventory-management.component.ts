@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 type VehicleStatus = 'In Stock' | 'Limited' | 'Sold';
 type VehicleCondition = 'New' | 'Used';
@@ -16,7 +16,17 @@ interface Vehicle {
   miles: number;
   price: number;
   status: VehicleStatus;
-  imageUrl: string; // cover image for cards
+  imageUrl: string;
+
+  // extra fields for modal (optional)
+  engine?: string;
+  drivetrain?: string;
+  mpg?: string;
+  seating?: number;
+  exteriorColor?: string;
+  interiorColor?: string;
+  description?: string;
+  features?: string[];
 }
 
 interface NewVehicleForm {
@@ -38,12 +48,11 @@ interface NewVehicleForm {
   miles: number;
   condition: VehicleCondition;
   seating: number;
-  color: string;
   exteriorColor: string;
   interiorColor: string;
 
   // step 4
-  features: string;
+  features: string;      // comma separated in wizard
   description: string;
   status: VehicleStatus;
   images: File[];
@@ -55,7 +64,7 @@ interface NewVehicleForm {
   templateUrl: './admin-inventory-management.component.html',
   styleUrls: ['./admin-inventory-management.component.scss'],
 })
-export class AdminInventoryManagementComponent implements OnInit {
+export class AdminInventoryManagementComponent implements OnInit, OnDestroy {
   // filters / search
   query = '';
   selectedMake: string = 'all';
@@ -63,7 +72,7 @@ export class AdminInventoryManagementComponent implements OnInit {
   selectedFuelType: string = 'all';
   selectedCondition: string = 'all';
 
-  // options (used in HTML)
+  // options
   makeOptions: string[] = [];
   bodyTypeOptions: string[] = [];
   fuelTypeOptions: string[] = [];
@@ -72,6 +81,10 @@ export class AdminInventoryManagementComponent implements OnInit {
   // wizard state
   showAddWizard = false;
   wizardStep = 1;
+
+  // view modal state
+  showViewModal = false;
+  selectedVehicle: Vehicle | null = null;
 
   // data
   vehicles: Vehicle[] = [
@@ -89,6 +102,15 @@ export class AdminInventoryManagementComponent implements OnInit {
       price: 75990,
       status: 'In Stock',
       imageUrl: 'assets/cars/demo-1.jpg',
+
+      engine: '3.0L Twin-Turbo I6',
+      drivetrain: 'RWD',
+      mpg: '16/23 MPG',
+      seating: 5,
+      exteriorColor: 'M Competition Blue',
+      interiorColor: 'Merino Leather Black',
+      description: 'Ultimate driving machine with track-proven performance.',
+      features: ['M Sport Package', 'Carbon Fiber Trim', 'Harman Kardon Sound'],
     },
     {
       id: 2,
@@ -104,6 +126,15 @@ export class AdminInventoryManagementComponent implements OnInit {
       price: 42990,
       status: 'In Stock',
       imageUrl: 'assets/cars/demo-2.jpg',
+
+      engine: 'Dual Motor (Electric)',
+      drivetrain: 'AWD',
+      mpg: '120/112 MPGe',
+      seating: 5,
+      exteriorColor: 'Pearl White Multi-Coat',
+      interiorColor: 'Black',
+      description: 'Fast, efficient, and minimalistic interior with great tech.',
+      features: ['Autopilot', 'Glass Roof', 'Premium Audio'],
     },
     {
       id: 3,
@@ -119,6 +150,15 @@ export class AdminInventoryManagementComponent implements OnInit {
       price: 118900,
       status: 'Limited',
       imageUrl: 'assets/cars/demo-3.jpg',
+
+      engine: '3.0L Turbo I6 + EQ Boost',
+      drivetrain: 'AWD',
+      mpg: '20/28 MPG',
+      seating: 5,
+      exteriorColor: 'Obsidian Black',
+      interiorColor: 'Nappa Leather Macchiato Beige',
+      description: 'Flagship luxury sedan with cutting-edge comfort and tech.',
+      features: ['Burmester Audio', 'Air Suspension', 'Massaging Seats'],
     },
   ];
 
@@ -127,9 +167,19 @@ export class AdminInventoryManagementComponent implements OnInit {
   // form model
   newVehicle: NewVehicleForm = this.createEmptyForm();
 
+  private onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && this.showViewModal) this.closeViewModal();
+  };
+
   ngOnInit(): void {
     this.rebuildFilterOptions();
     this.applyFilters();
+    window.addEventListener('keydown', this.onKeyDown);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('keydown', this.onKeyDown);
+    document.body.classList.remove('inv-modal-open');
   }
 
   // -----------------------------
@@ -216,6 +266,13 @@ export class AdminInventoryManagementComponent implements OnInit {
         ? URL.createObjectURL(this.newVehicle.images[0])
         : 'assets/cars/demo-1.jpg';
 
+    const featuresArr = this.newVehicle.features
+      ? this.newVehicle.features
+          .split(',')
+          .map(x => x.trim())
+          .filter(Boolean)
+      : [];
+
     const vehicle: Vehicle = {
       id,
       make: this.newVehicle.make.trim(),
@@ -230,6 +287,15 @@ export class AdminInventoryManagementComponent implements OnInit {
       price: Number(this.newVehicle.price) || 0,
       status: this.newVehicle.status,
       imageUrl: coverUrl,
+
+      engine: this.newVehicle.engine?.trim(),
+      drivetrain: this.newVehicle.drivetrain?.trim(),
+      mpg: this.newVehicle.mpg?.trim(),
+      seating: Number(this.newVehicle.seating) || 5,
+      exteriorColor: this.newVehicle.exteriorColor?.trim(),
+      interiorColor: this.newVehicle.interiorColor?.trim(),
+      description: this.newVehicle.description?.trim(),
+      features: featuresArr,
     };
 
     this.vehicles.unshift(vehicle);
@@ -239,23 +305,35 @@ export class AdminInventoryManagementComponent implements OnInit {
   }
 
   // -----------------------------
-  // Card actions (FIX for your errors)
+  // Card actions
   // -----------------------------
   viewVehicle(v: Vehicle): void {
-    console.log('View vehicle', v.id);
-    // kasnije: router navigate ili modal
-    // this.router.navigate(['/admin/inventory', v.id]);
+    this.selectedVehicle = v;
+    this.showViewModal = true;
+    document.body.classList.add('inv-modal-open');
   }
 
-  markSold(v: Vehicle): void {
-    v.status = 'Sold';
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.selectedVehicle = null;
+    document.body.classList.remove('inv-modal-open');
+  }
+
+  setStatus(v: Vehicle, status: VehicleStatus): void {
+    v.status = status;
     this.applyFilters();
+    // keep modal open (looks nicer), but if you want to auto close on delete/sold etc:
+    // this.closeViewModal();
   }
 
   deleteVehicle(v: Vehicle): void {
     this.vehicles = this.vehicles.filter((x) => x.id !== v.id);
     this.rebuildFilterOptions();
     this.applyFilters();
+
+    if (this.selectedVehicle?.id === v.id) {
+      this.closeViewModal();
+    }
   }
 
   // -----------------------------
@@ -283,7 +361,6 @@ export class AdminInventoryManagementComponent implements OnInit {
       miles: 0,
       condition: 'New',
       seating: 5,
-      color: '',
       exteriorColor: '',
       interiorColor: '',
 
