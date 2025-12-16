@@ -1,0 +1,369 @@
+<div class="inv-page">
+
+  <!-- ================= TOOLBAR ================= -->
+  <div class="inv-toolbar-card">
+
+    <!-- TOP ROW -->
+    <div class="inv-row inv-row--top">
+      <div class="inv-search">
+        <span class="inv-search__icon material-icons">search</span>
+        <input
+          class="inv-search__input"
+          type="text"
+          placeholder="Search by make, model, or year..."
+          [(ngModel)]="query"
+          (ngModelChange)="applyFilters()"
+        />
+      </div>
+
+      <div class="inv-actions">
+        <button
+          type="button"
+          class="btn-ghost inv-filter-btn d-md-none"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#invFiltersOffcanvas"
+          aria-controls="invFiltersOffcanvas">
+          <span class="material-icons">tune</span>
+          Filters
+        </button>
+
+        <button class="btn-primary" type="button" (click)="addVehicle()">
+          <span class="material-icons">add</span>
+          Add Vehicle
+        </button>
+      </div>
+    </div>
+
+    <div class="inv-divider"></div>
+
+    <!-- DESKTOP FILTERS -->
+    <div class="inv-row inv-row--filters d-none d-md-flex">
+      <div class="filters-label">
+        <span class="material-icons">tune</span>
+        Filters:
+      </div>
+
+      <div class="filters-grid">
+        <select class="inv-select" [(ngModel)]="selectedMake" (change)="applyFilters()">
+          <option value="all">All Makes</option>
+          <option *ngFor="let m of makeOptions" [value]="m">{{ m }}</option>
+        </select>
+
+        <select class="inv-select" [(ngModel)]="selectedBodyType" (change)="applyFilters()">
+          <option value="all">All Body Types</option>
+          <option *ngFor="let b of bodyTypeOptions" [value]="b">{{ b }}</option>
+        </select>
+
+        <select class="inv-select" [(ngModel)]="selectedFuelType" (change)="applyFilters()">
+          <option value="all">All Fuel Types</option>
+          <option *ngFor="let f of fuelTypeOptions" [value]="f">{{ f }}</option>
+        </select>
+
+        <select class="inv-select" [(ngModel)]="selectedCondition" (change)="applyFilters()">
+          <option value="all">All Conditions</option>
+          <option value="New">New</option>
+          <option value="Used">Used</option>
+        </select>
+      </div>
+
+      <button class="btn-ghost" type="button" (click)="resetFilters()">
+        <span class="material-icons">restart_alt</span>
+        Reset
+      </button>
+    </div>
+
+    <div class="inv-meta">
+      Showing <b>{{ filteredVehicles.length }}</b> of <b>{{ vehicles.length }}</b> vehicles
+    </div>
+  </div>
+
+  <!-- ================= OFFCANVAS FILTERS (MOBILE) ================= -->
+  <div
+    class="offcanvas offcanvas-bottom inv-offcanvas"
+    tabindex="-1"
+    id="invFiltersOffcanvas"
+    aria-labelledby="invFiltersOffcanvasLabel"
+  >
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="invFiltersOffcanvasLabel">Filters</h5>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="offcanvas"
+        aria-label="Close">
+      </button>
+    </div>
+
+    <div class="offcanvas-body">
+      <div class="inv-offcanvas-grid">
+
+        <div class="inv-field">
+          <label class="inv-label">Make</label>
+          <select class="inv-select" [(ngModel)]="selectedMake" (change)="applyFilters()">
+            <option value="all">All Makes</option>
+            <option *ngFor="let m of makeOptions" [value]="m">{{ m }}</option>
+          </select>
+        </div>
+
+        <div class="inv-field">
+          <label class="inv-label">Body type</label>
+          <select class="inv-select" [(ngModel)]="selectedBodyType" (change)="applyFilters()">
+            <option value="all">All Body Types</option>
+            <option *ngFor="let b of bodyTypeOptions" [value]="b">{{ b }}</option>
+          </select>
+        </div>
+
+        <div class="inv-field">
+          <label class="inv-label">Fuel type</label>
+          <select class="inv-select" [(ngModel)]="selectedFuelType" (change)="applyFilters()">
+            <option value="all">All Fuel Types</option>
+            <option *ngFor="let f of fuelTypeOptions" [value]="f">{{ f }}</option>
+          </select>
+        </div>
+
+        <div class="inv-field">
+          <label class="inv-label">Condition</label>
+          <select class="inv-select" [(ngModel)]="selectedCondition" (change)="applyFilters()">
+            <option value="all">All Conditions</option>
+            <option value="New">New</option>
+            <option value="Used">Used</option>
+          </select>
+        </div>
+
+        <div class="inv-offcanvas-actions">
+          <button class="btn-ghost w-100" type="button" (click)="resetFilters()">
+            <span class="material-icons">restart_alt</span>
+            Reset
+          </button>
+
+          <button class="btn-primary w-100" type="button" data-bs-dismiss="offcanvas">
+            Apply
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ADD VEHICLE WIZARD ================= -->
+  <div class="inv-wizard-card" *ngIf="showAddWizard">
+
+    <div class="wizard-head">
+      <div>
+        <div class="wizard-title">Add New Vehicle</div>
+        <div class="wizard-step">Step {{ wizardStep }} of 4</div>
+      </div>
+
+      <button class="icon-x" type="button" (click)="closeWizard()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="wizard-progress">
+      <div class="wizard-progress__bar" [style.width.%]="wizardStep * 25"></div>
+    </div>
+
+    <!-- ===== STEP 1 ===== -->
+    <div class="wizard-body" *ngIf="wizardStep === 1">
+      <div class="section-title">Basic Information</div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Make *</label>
+          <input class="inv-input" [(ngModel)]="newVehicle.make">
+        </div>
+
+        <div class="field">
+          <label>Model *</label>
+          <input class="inv-input" [(ngModel)]="newVehicle.model">
+        </div>
+
+        <div class="field">
+          <label>Year *</label>
+          <input class="inv-input" type="number" [(ngModel)]="newVehicle.year">
+        </div>
+
+        <div class="field">
+          <label>Price *</label>
+          <input class="inv-input" type="number" [(ngModel)]="newVehicle.price">
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 2 ===== -->
+    <div class="wizard-body" *ngIf="wizardStep === 2">
+      <div class="section-title">Technical Specifications</div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Engine *</label>
+          <input class="inv-input" [(ngModel)]="newVehicle.engine">
+        </div>
+
+        <div class="field">
+          <label>Horsepower *</label>
+          <input class="inv-input" type="number" [(ngModel)]="newVehicle.hp">
+        </div>
+
+        <div class="field">
+          <label>Transmission *</label>
+          <select class="inv-input" [(ngModel)]="newVehicle.transmission">
+            <option value="Automatic">Automatic</option>
+            <option value="Manual">Manual</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Fuel Type *</label>
+          <select class="inv-input" [(ngModel)]="newVehicle.fuelType">
+            <option value="Gasoline">Gasoline</option>
+            <option value="Diesel">Diesel</option>
+            <option value="Electric">Electric</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 3 ===== -->
+    <div class="wizard-body" *ngIf="wizardStep === 3">
+      <div class="section-title">Vehicle Details</div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Body Type *</label>
+          <select class="inv-input" [(ngModel)]="newVehicle.bodyType">
+            <option value="Sedan">Sedan</option>
+            <option value="SUV">SUV</option>
+            <option value="Coupe">Coupe</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Mileage *</label>
+          <input class="inv-input" type="number" [(ngModel)]="newVehicle.miles">
+        </div>
+
+        <div class="field">
+          <label>Condition *</label>
+          <select class="inv-input" [(ngModel)]="newVehicle.condition">
+            <option value="New">New</option>
+            <option value="Used">Used</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Color</label>
+          <input class="inv-input" [(ngModel)]="newVehicle.color">
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEP 4 ===== -->
+    <div class="wizard-body" *ngIf="wizardStep === 4">
+      <div class="section-title">Images & Description</div>
+
+      <div class="form-grid">
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>Description *</label>
+          <textarea class="inv-textarea" rows="4" [(ngModel)]="newVehicle.description"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Status *</label>
+          <select class="inv-input" [(ngModel)]="newVehicle.status">
+            <option value="In Stock">In Stock</option>
+            <option value="Limited">Limited</option>
+            <option value="Sold">Sold</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Upload Images *</label>
+          <input type="file" multiple accept="image/*" (change)="onImagesSelected($event)" />
+          <div class="file-meta" *ngIf="newVehicle.images.length">
+            {{ newVehicle.images.length }} image(s) selected
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="wizard-actions">
+      <button
+        class="btn-soft-gray"
+        type="button"
+        *ngIf="wizardStep > 1"
+        (click)="prevStep()">
+        <span class="material-icons">chevron_left</span>
+        Back
+      </button>
+
+      <button
+        class="btn-primary"
+        type="button"
+        *ngIf="wizardStep < 4"
+        (click)="nextStep()">
+        Next
+        <span class="material-icons">chevron_right</span>
+      </button>
+
+      <button
+        class="btn-primary"
+        type="button"
+        *ngIf="wizardStep === 4"
+        (click)="saveNewVehicle()">
+        Add Vehicle
+        <span class="material-icons">check</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= VEHICLE GRID ================= -->
+  <div class="inv-grid">
+    <div class="vehicle-card" *ngFor="let v of filteredVehicles">
+
+      <div class="vehicle-media">
+        <img [src]="v.imageUrl" [alt]="v.make + ' ' + v.model">
+        <span class="badge" [ngClass]="badgeClass(v.status)">{{ v.status }}</span>
+      </div>
+
+      <!-- ✅ DODANO: specs + action buttons -->
+      <div class="vehicle-body">
+        <div class="vehicle-title">{{ v.make }} {{ v.model }}</div>
+        <div class="vehicle-sub">{{ v.year }} · {{ v.condition }}</div>
+
+        <div class="vehicle-price">
+          ${{ v.price | number:'1.0-0' }}
+          <span class="muted"> · {{ v.miles }} miles</span>
+        </div>
+
+        <div class="vehicle-specs">
+          <div><span class="material-icons">directions_car</span>{{ v.bodyType }}</div>
+          <div><span class="material-icons">local_gas_station</span>{{ v.fuelType }}</div>
+          <div><span class="material-icons">settings</span>{{ v.transmission }}</div>
+          <div><span class="material-icons">bolt</span>{{ v.hp }} hp</div>
+        </div>
+
+        <div class="vehicle-actions">
+          <button class="btn-soft" type="button" (click)="viewVehicle(v)">
+            <span class="material-icons">visibility</span> View
+          </button>
+
+          <button
+            class="btn-soft danger"
+            type="button"
+            (click)="markSold(v)"
+            *ngIf="v.status !== 'Sold'">
+            <span class="material-icons">close</span> Sold
+          </button>
+
+          <button class="icon-trash" type="button" (click)="deleteVehicle(v)" aria-label="Delete">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

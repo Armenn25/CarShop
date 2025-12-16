@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { AdminRoutingModule } from './admin-routing-module';
@@ -15,6 +14,7 @@ import { AdminTestDrivesComponent } from './test-drives/admin-test-drives/admin-
 import { AdminQuoteRequestsComponent } from './quote-requests/admin-quote-requests/admin-quote-requests.component';
 import { AdminSellCarRequestsComponent} from './sell-car-requests/sell-car-requests.component';
 import { AdminSalesStatsComponent } from './sales-stats/sales-stats.component';
+import { AdminInventoryManagementComponent } from './inventory-management/admin-inventory-management.component';
 
 @NgModule({
   declarations: [
@@ -24,11 +24,11 @@ import { AdminSalesStatsComponent } from './sales-stats/sales-stats.component';
     AdminTestDrivesComponent,
     AdminQuoteRequestsComponent,
     AdminSellCarRequestsComponent,
-    AdminSalesStatsComponent
+    AdminSalesStatsComponent,
+    AdminInventoryManagementComponent
   ],
   imports: [
-    CommonModule,
-    RouterModule,   
+    CommonModule,      
     FormsModule, 
     AdminRoutingModule,
     SharedModule,   

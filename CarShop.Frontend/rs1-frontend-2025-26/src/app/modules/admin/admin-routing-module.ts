@@ -6,6 +6,7 @@ import { AdminTestDrivesComponent } from './test-drives/admin-test-drives/admin-
 import { AdminQuoteRequestsComponent } from './quote-requests/admin-quote-requests/admin-quote-requests.component';
 import { AdminSellCarRequestsComponent } from './sell-car-requests/sell-car-requests.component';
 import { AdminSalesStatsComponent} from './sales-stats/sales-stats.component';
+import { AdminInventoryManagementComponent } from './inventory-management/admin-inventory-management.component';
 
 const routes: Routes = [
   {
@@ -36,6 +37,11 @@ const routes: Routes = [
       {
         path: 'sales-stats',
         component: AdminSalesStatsComponent,
+      },
+
+      {
+        path: 'inventory-management',
+        component: AdminInventoryManagementComponent,
       },
 
 
