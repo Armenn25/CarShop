@@ -7,7 +7,7 @@ import {
   ViewChild,
   OnDestroy,
 } from '@angular/core';
-import { Router } from '@angular/router';
+
 import { CurrentUserService } from '../../../core/services/auth/current-user.service';
 
 @Component({
@@ -53,7 +53,17 @@ export class PublicLayoutComponent implements AfterViewInit, OnDestroy {
   isRegisterOpen = false;
   isRegisterClosing = false;
 
-  constructor(private router: Router, private currentUser: CurrentUserService) {}
+
+  // LOGOUT POPUP
+  isLogoutOpen = false;
+  isLogoutClosing = false;
+
+  constructor( private currentUser: CurrentUserService) {}
+
+  // helper za template – da li user ima admin rolu
+  get isAdmin(): boolean {
+    return this.currentUser.isAdmin();
+  }
 
   // helper za template – da li je user logovan
   get isAuthenticated(): boolean {
@@ -333,10 +343,28 @@ export class PublicLayoutComponent implements AfterViewInit, OnDestroy {
   // =========================
   // LOGOUT
   // =========================
-  logout(): void {
-    this.router.navigate(['/auth/logout']);
+ openLogoutModal(): void {
+    this.isLogoutClosing = false;
+    this.isLogoutOpen = true;
   }
 
+  closeLogoutModal(): void {
+    if (this.isLogoutClosing) return;
+    this.isLogoutClosing = true;
+
+    setTimeout(() => {
+      this.isLogoutOpen = false;
+      this.isLogoutClosing = false;
+    }, 220);
+  }
+
+  handleLogoutCompleted(): void {
+    this.closeLogoutModal();
+  }
+  logout(): void {
+    // postojeći LogoutComponent na /auth/logout ruti
+    this.openLogoutModal();
+  }
   // =========================
   // NAVBAR HIDING ON SCROLL
   // =========================

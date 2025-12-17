@@ -1021,9 +1021,8 @@ $accent-b: #0b57ff;
     height: 380px;
   }
 }
-
 /* =========================================================
-   HOW IT WORKS (smooth bg + sweep only + stagger reveal)
+   HOW IT WORKS (smooth bg + sweep stays + stagger fly-in)
    ========================================================= */
 
 .how-works {
@@ -1111,7 +1110,7 @@ $accent-b: #0b57ff;
   }
 }
 
-/* ===== sweep (VIDLJIV SAMO DOK IDE) ===== */
+/* ===== sweep (BAZNA LINIJA OSTANE + highlight sweep prođe) ===== */
 .how-works__grid {
   margin-top: 46px;
 }
@@ -1126,12 +1125,29 @@ $accent-b: #0b57ff;
   z-index: 0;
   pointer-events: none;
 
-  /* ✅ NEMA sive statične linije */
+  /* pojavi se kad sekcija uđe */
+  opacity: 0;
+  transform: scaleX(0.94);
+  transform-origin: center;
+  transition: opacity 520ms ease, transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ✅ bazna crtica koja OSTANE */
   &::before {
-    content: none !important;
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.10) 18%,
+      rgba(255, 255, 255, 0.10) 82%,
+      transparent 100%
+    );
+    opacity: 1;
   }
 
-  /* ✅ highlight koji se pojavi samo dok sweepa i nestane */
+  /* ✅ highlight koji “proleti” jednom */
   &::after {
     content: '';
     position: absolute;
@@ -1176,27 +1192,56 @@ $accent-b: #0b57ff;
   100% {
     left: 120%;
     opacity: 0;
-  } /* ✅ ode skroz desno i nestane */
+  }
 }
 
-/* ===== cards (stagger reveal) ===== */
+/* kad sekcija postane vidljiva */
+.how-works.is-visible .how-works__sweep {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* highlight sweep prođe jednom */
+.how-works.is-visible .how-works__sweep::after {
+  animation: howSweep 1150ms linear 180ms 1;
+}
+
+/* ===== cards (stagger “sletanje”) ===== */
 .how-step {
   text-align: center;
   position: relative;
   z-index: 1;
 
   opacity: 0;
-  transform: translateY(18px);
-  filter: blur(2px);
-
-  transition: opacity 620ms ease, transform 620ms cubic-bezier(0.16, 1, 0.3, 1), filter 620ms ease;
-
-  transition-delay: var(--d, 0ms);
+  transform: translate3d(0, 26px, 0) scale(0.98);
+  will-change: transform, opacity;
 
   &:hover .how-step__tile {
     transform: translateY(-2px);
     box-shadow: 0 22px 54px rgba(0, 160, 255, 0.22);
   }
+}
+
+@keyframes howStepIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0) scale(0.98);
+  }
+  65% {
+    opacity: 1;
+  }
+  82% {
+    transform: translate3d(0, -6px, 0) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* ✅ stagger: koristi tvoj --d iz template-a + mali offset */
+.how-works.is-visible .how-step {
+  animation: howStepIn 780ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--d, 0ms) + 240ms) both;
 }
 
 .how-step__icon-wrap {
@@ -1266,21 +1311,10 @@ $accent-b: #0b57ff;
   margin-inline: auto;
 }
 
-/* ✅ kada sekcija postane vidljiva */
-.how-works.is-visible .how-step {
-  opacity: 1;
-  transform: translateY(0);
-  filter: blur(0);
-}
-
-/* ✅ sweep se vidi samo dok animira (bez 'both') */
-.how-works.is-visible .how-works__sweep::after {
-  animation: howSweep 1150ms linear 180ms 1;
-}
-
 /* Respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .how-step,
+  .how-works__sweep,
   .how-works__sweep::after {
     transition: none !important;
     animation: none !important;
@@ -1289,6 +1323,7 @@ $accent-b: #0b57ff;
     filter: none !important;
   }
 }
+
 
 /* =========================================================
    PREMIUM EXPERIENCE (compatible with your premiumFeatures)

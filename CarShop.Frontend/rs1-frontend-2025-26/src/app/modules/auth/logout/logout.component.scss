@@ -2,274 +2,271 @@
   display: block;
 }
 
-/* pozadina kao kod login-page */
+/* FULL PAGE (ako ikad koristiš /logout rutu) */
 .logout-page {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   padding: 32px 16px;
-  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.16), transparent 45%),
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.16), transparent 45%),
     radial-gradient(circle at 80% 10%, rgba(91, 157, 255, 0.16), transparent 48%),
     linear-gradient(135deg, #0f3b95 0%, #2c7be9 60%, #3d93ff 100%);
-  color: #16233f;
 }
 
-/* glavna kartica – ista logika kao login-card */
+/* CARD */
 .logout-card {
-  position: relative;
-  width: 100%;
-  max-width: 520px;
-  background: #ffffff;
-  border-radius: 22px;
+  width: 480px;
+  border-radius: 28px;
   overflow: hidden;
+  background: #fff;
   box-shadow: 0 26px 70px rgba(8, 36, 94, 0.35);
-  animation: cardEnter 0.28s ease-out;
 }
 
-/* header kao kod login.card-header, samo malo jednostavniji */
+.logout-card-compact {
+  /* popup varijanta */
+  margin: 0;
+}
+
+/* TOP (GRADIENT HEADER) */
 .logout-header {
   position: relative;
-  background: linear-gradient(135deg, #0066ff 0%, #5a30ff 100%);
-  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.25);
-  color: #ffffff;
-  padding: 42px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: flex-start;
+  flex: 0 0 auto;
+
+  /* NEMA razvlačenja */
+  min-height: clamp(150px, 18vh, 190px);
+  height: auto;
+
+  padding: 18px 22px 18px;
+  color: #fff;
+  background: linear-gradient(180deg, #4f8dff 0%, #3d66ff 45%, #4b2bff 100%);
   overflow: hidden;
 
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    border-radius: 50%;
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  // veći, jači krug
-  &::before {
-    width: 240px;
-    height: 260px;
-    top: -120px;
-    right: -40px;
-    background: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 0 40px rgba(255, 255, 255, 0.25);
-    animation: bubbleMove1 14s ease-in-out infinite alternate;
-  }
-
-  // manji krug
-  &::after {
-    width: 180px;
-    height: 160px;
-    bottom: -100px;
-    right: 300px;
-    background: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 0 40px rgba(255, 255, 255, 0.25);
-    animation: bubbleMove2 18s ease-in-out infinite alternate;
-  }
-
-  .text {
-    position: relative;
-    z-index: 1;
-  }
-}
-
-.logout-header-top {
-  position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+}
 
-  h2 {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 400;
+/* sweep krug (da ne “pojede” header kad je manji) */
+.logout-header::before {
+  content: "";
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  left: -150px;
+  bottom: -235px;
+  background: rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+}
+
+.logout-icon-tile {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+
+  mat-icon {
+    color: #fff;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 1;
   }
 }
 
-.logout-icon-circle {
-  width: 54px;
-  height: 54px;
+.logout-title {
+  margin: 2px 0 0;
+  font-size: 24px;      /* malo veće da “popuni” */
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.logout-subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.35;
+  opacity: 0.92;
+
+  /* KLJUČ: prirodno prelamanje u 2-3 reda da header djeluje popunjen */
+  max-width: 170px;
+}
+
+
+.logout-icon-tile {
+  width: 58px;
+  height: 58px;
   border-radius: 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.18);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
 
   mat-icon {
     color: #ffffff;
     font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 1;
   }
 }
 
-.logout-subtitle {
-  position: relative;
-  z-index: 1;
-  margin: 10px 0 0;
-  font-size: 14px;
-  opacity: 0.9;
+.logout-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
 }
 
-/* body */
+.logout-subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.35;
+  opacity: 0.92;
+}
+
+/* BOTTOM (WHITE BODY) */
 .logout-body {
-  padding: 30px 32px 32px;
+  position: relative;
+  padding: 26px 26px 26px;
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
+  background: #fff;
+}
+
+/* “shadow seam” između headera i body kao na slici */
+.logout-body::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -18px;
+  height: 18px;
+  background: linear-gradient(to bottom, rgba(9, 25, 70, 0.18), transparent);
 }
 
 .status-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 72px;          // promijeni po želji
-  height: 72px;
+  width: 86px;
+  height: 86px;
   border-radius: 50%;
-  background-color: #e8f7ec;
-  margin: 0 auto 8px;
-}
+  background: #e8f7ec;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 2px;
 
-/* ovdje rješavamo “preveliku” kvačicu */
-.status-icon mat-icon {
-  font-size: 28px;      // manja ikonica da stane u krug
-  width: 28px;
-  height: 28px;
-  line-height: 1;       // da ne iskače vertikalno
-}
-
-.status-icon.success mat-icon {
-  color: #21a35b;
+  mat-icon {
+    font-size: 30px;
+    width: 30px;
+    height: 30px;
+    line-height: 1;
+    color: #21a35b;
+  }
 }
 
 .logout-message {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 800;
   color: #18213c;
 }
 
 .logout-description {
-  margin: 0;
+  margin: 0 auto;
   font-size: 14px;
+  line-height: 1.55;
   color: #6a789b;
+  max-width: 240px;
 }
 
-/* progress kartica */
+/* PROGRESS BOX */
 .logout-progress-card {
-  margin-top: 4px;
-  border-radius: 16px;
-  padding: 14px 18px 16px;
-  background: #f8faff;
-  border: 1px solid #e3ebff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  width: 88%;
+  max-width: 350px;
+  margin: 10px auto 0;
+  border-radius: 18px;
+  padding: 14px 16px 14px;
+  background: #f5f9ff;
+  border: 1px solid #e0eaff;
 }
 
-/* Bootstrap progress, ali scoped samo na logout */
-.logout-progress-card .progress-track {
+.progress-track {
   width: 100%;
   height: 6px;
   border-radius: 999px;
-  background: #dde5f5;
+  background: #dbe6ff;
   overflow: hidden;
 }
 
-.logout-progress-card .progress-track .logout-progress-bar {
+.logout-progress-bar {
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #0066ff 0%, #5a30ff 100%);
+  background: linear-gradient(90deg, #1e63ff 0%, #2f5bff 40%, #3f2dff 100%);
   transform-origin: left center;
-  animation: progressFill 2s ease-out forwards;
+  transform: scaleX(0);
+}
+
+/* animaciju palimo tek kad starta countdown */
+.logout-progress-bar.is-active {
+  animation-name: progressFill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
 }
 
 .progress-footer {
+  margin-top: 10px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  justify-content: center;
+  gap: 10px;
   color: #41527a;
-
-  strong {
-    color: #0066ff;
-  }
 }
 
 .progress-icon {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 999px;
   background: #e4edff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
 
   mat-icon {
     font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
     color: #2b7be9;
   }
 }
 
-/* dugme (ako ga koristiš) */
-.back-to-login-btn {
-  margin-top: 4px;
-  align-self: center;
-  padding-inline: 22px;
-
-  mat-icon {
-    margin-right: 6px;
-  }
+.progress-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  font-size: 13px;
+  text-align: left;
 }
 
-/* ANIMACIJE */
-@keyframes cardEnter {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.progress-label {
+  opacity: 0.95;
 }
 
+.progress-count strong {
+  color: #1e63ff;
+  font-weight: 800;
+}
+
+/* ANIM */
 @keyframes progressFill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes bubbleMove1 {
-  0%   { transform: translate(0, 0); }
-  50%  { transform: translate(-20px, 15px) scale(1.05); }
-  100% { transform: translate(-40px, -10px) scale(1.1); }
-}
-
-@keyframes bubbleMove2 {
-  0%   { transform: translate(0, 0); }
-  50%  { transform: translate(25px, -10px) scale(0.95); }
-  100% { transform: translate(40px, 15px) scale(1.02); }
-}
-
-/* responsive */
-@media (max-width: 540px) {
-  .logout-card {
-    max-width: 100%;
-  }
-
-  .logout-body {
-    padding-inline: 22px;
-  }
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }

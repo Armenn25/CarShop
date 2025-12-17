@@ -37,8 +37,8 @@ export class LoginComponent extends BaseComponent implements OnInit {
   submitted = false;
 
   form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    email: ['admin@carshop.local', [Validators.required, Validators.email]],
+    password: ['Admin123!', [Validators.required, Validators.minLength(6)]],
     rememberMe: [false],
   });
 

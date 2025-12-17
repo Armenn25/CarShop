@@ -1,6 +1,6 @@
 <!-- src/app/layouts/public-layout/public-layout.component.html -->
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-<div class="public-layout" [class.blurred]="isLoginOpen || isRegisterOpen">
+<div class="public-layout" [class.blurred]="isLoginOpen || isRegisterOpen || isLogoutOpen">
   <div class="landing-page">
     <!--NAV BAR-->
     <nav class="navbar app-navbar navbar-expand-lg" [class.is-hidden]="navHidden">
@@ -71,15 +71,27 @@
 
               <!-- Ako JE logovan: samo LOGOUT -->
               <ng-template #loggedInCta>
-                <button
-                  mat-raised-button
-                  color="primary"
-                  class="nav-auth-button"
-                  (click)="logout()"
-                >
-                  <mat-icon>logout</mat-icon>
-                  Odjavi se
-                </button>
+                <div class="d-flex flex-row gap-2">
+                  <button
+                    *ngIf="isAdmin"
+                    mat-stroked-button
+                    class="nav-auth-button"
+                    routerLink="/admin/dashboard"
+                  >
+                    <mat-icon>admin_panel_settings</mat-icon>
+                    Admin
+                  </button>
+
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    class="nav-auth-button"
+                    (click)="logout()"
+                  >
+                    <mat-icon>logout</mat-icon>
+                    Odjavi se
+                  </button>
+                </div>
               </ng-template>
             </li>
           </ul>
@@ -87,30 +99,45 @@
 
         <!-- RIGHT ACTIONS (desktop) -->
         <!-- Ako NIJE logovan: prikazuj LOGIN + REGISTER -->
-        <ng-container *ngIf="!isAuthenticated; else loggedInCta">
-          <button
-            mat-raised-button
-            color="primary"
-            class="nav-auth-button"
-            (click)="openLoginModal()"
-          >
-            <mat-icon>login</mat-icon>
-            LOG IN
-          </button>
+        <div class="app-navbar__actions d-none d-lg-flex align-items-center gap-2">
+          <!-- Ako NIJE logovan: prikazuj LOGIN + REGISTER -->
+          <ng-container *ngIf="!isAuthenticated; else loggedInCta">
+            <button
+              mat-raised-button
+              color="primary"
+              class="nav-auth-button"
+              (click)="openLoginModal()"
+            >
+              <mat-icon>login</mat-icon>
+              LOG IN
+            </button>
 
-          <button mat-stroked-button class="nav-auth-button" (click)="openRegisterModal()">
-            <mat-icon>person_add</mat-icon>
-            REGISTER
-          </button>
-        </ng-container>
+            <button mat-stroked-button class="nav-auth-button" (click)="openRegisterModal()">
+              <mat-icon>person_add</mat-icon>
+              REGISTER
+            </button>
+          </ng-container>
 
-        <!-- Ako JE logovan: samo LOGOUT -->
-        <ng-template #loggedInCta>
-          <button mat-raised-button color="primary" class="nav-auth-button" (click)="logout()">
-            <mat-icon>logout</mat-icon>
-            Odjavi se
-          </button>
-        </ng-template>
+          <!-- Ako JE logovan: samo LOGOUT -->
+          <ng-template #loggedInCta>
+            <div class="d-flex align-items-center gap-2">
+              <button
+                *ngIf="isAdmin"
+                mat-stroked-button
+                class="nav-auth-button"
+                routerLink="/admin/dashboard"
+              >
+                <mat-icon>admin_panel_settings</mat-icon>
+                Admin
+              </button>
+
+              <button mat-raised-button color="primary" class="nav-auth-button" (click)="logout()">
+                <mat-icon>logout</mat-icon>
+                Odjavi se
+              </button>
+            </div>
+          </ng-template>
+        </div>
       </div>
     </nav>
     <main class="public-main">
@@ -661,5 +688,24 @@
       (closed)="closeRegisterModal()"
       (signIn)="handleSignInFromRegister()"
     ></app-register>
+  </div>
+</div>
+<!-- LOGOUT POPUP -->
+<div
+  class="login-backdrop"
+  *ngIf="isLogoutOpen"
+  (click)="closeLogoutModal()"
+  [class.is-closing]="isLogoutClosing"
+>
+  <div
+    class="login-modal"
+    (click)="$event.stopPropagation()"
+    [class.is-closing]="isLogoutClosing"
+  >
+    <app-logout
+      [compact]="true"
+      [redirectToLogin]="false"
+      (completed)="handleLogoutCompleted()"
+    ></app-logout>
   </div>
 </div>

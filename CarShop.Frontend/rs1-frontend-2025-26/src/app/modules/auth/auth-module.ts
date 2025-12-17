@@ -15,17 +15,18 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     RegisterComponent,
     ForgotPasswordComponent,
     LogoutComponent,
-    
+
 
   ],
   imports: [
     AuthRoutingModule,
-    SharedModule,    
+    SharedModule,
     MatSnackBarModule
   ],
   exports: [
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    LogoutComponent
   ]
 })
 export class AuthModule { }
